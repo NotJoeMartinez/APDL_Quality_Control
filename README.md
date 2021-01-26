@@ -1,5 +1,5 @@
 # image_diff
-Given hundreds of similar images image_diff finds the images that match the "perfect" image. This project is intended to help with the quality control process of manufacturing 100s chipsets.
+Given hundreds of similar images image_diff finds the images that match the "perfect" image. This project is intended to help with the quality control process of manufacturing chipsets.
 
 
 ## Data Set 
