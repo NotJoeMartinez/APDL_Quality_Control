@@ -10,7 +10,7 @@ a machine learning model to identify cats & dogs. Eventually I need to find a wa
 
 I shopped a minor difference in the same rasberi pi 
 
-![image-20210125223744102](/Users/supernova/labwork/image_diff/README.assets/image-20210125223744102.png)
+![README.assets/image-20210125223744102](/Users/supernova/labwork/image_diff/README.assets/image-20210125223744102.png)
 
 ImageMajick diff code 
 ```bash
