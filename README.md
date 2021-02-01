@@ -8,7 +8,7 @@ a machine learning model to identify cats & dogs. Eventually I need to find a wa
 
 ## ImageMajick
 
-I shopped a minor difference in the same rasberi pi 
+I shopped a minor difference in the same raspberry pi 
 
 ![image-20210125223744102](README.assets/image-20210125223744102.png)
 
