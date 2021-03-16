@@ -45,9 +45,8 @@ transformations = {
                    'blurring image': blur_image
                  }                
 
-# path to original/augmented images
-images_path="classified_imgs/glue/" 
-augmented_path="augmented_imgs/glue/" 
+images_path=str(input("normal images path: "))
+augmented_path=str(input("augmented images path: "))
 images=[]  
 
 # read image name from folder and append its path into "images" array     
@@ -55,7 +54,7 @@ for im in os.listdir(images_path):
     images.append(os.path.join(images_path,im))
 
 # you can change this value according to your requirement
-images_to_generate=200  
+images_to_generate=int(input("number of images to generate: "))
 i=1                        
 
 while i <= images_to_generate:    
