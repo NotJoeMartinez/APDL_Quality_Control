@@ -11,7 +11,7 @@ from tensorflow.keras.models import Sequential
 import pathlib
 import datetime as dt
 
-data_dir = "datasets/training/"
+data_dir = "datasets/train_broken_wire"
 data_dir = pathlib.Path(data_dir)
 
 
@@ -43,7 +43,7 @@ class_names = train_ds.class_names
 print(class_names)
 
 
-num_classes = 6
+num_classes = 2
 
 model = Sequential([
   layers.experimental.preprocessing.Rescaling(1./255, input_shape=(img_height, img_width, 3)),
@@ -58,7 +58,7 @@ model = Sequential([
   layers.Dense(num_classes)
 ])
 
-model.summary()
+# model.summary()
 
 model.compile(optimizer='adam',
               loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
@@ -96,7 +96,4 @@ print(
     .format(class_names[np.argmax(score)], 100 * np.max(score))
 )
 
-import matplotlib.image as mpimg
-import matplotlib.pyplot as plt
 
-imgplot = plt.imshow(mpimg.imgread(test_path))

@@ -7,6 +7,8 @@ env/
 .AppleDouble
 .LSOverride
 
+test.py
+
 # Don't push the datasets (they're too big.. ) 
 datasets/
 datasets/*.png
