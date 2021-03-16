@@ -1,4 +1,3 @@
-import matplotlib.pyplot as plt
 import numpy as np
 import os
 import PIL
@@ -45,39 +44,10 @@ print(class_names)
 
 num_classes = 6
 
-model = Sequential([
-  layers.experimental.preprocessing.Rescaling(1./255, input_shape=(img_height, img_width, 3)),
-  layers.Conv2D(16, 3, padding='same', activation='relu'),
-  layers.MaxPooling2D(),
-  layers.Conv2D(32, 3, padding='same', activation='relu'),
-  layers.MaxPooling2D(),
-  layers.Conv2D(64, 3, padding='same', activation='relu'),
-  layers.MaxPooling2D(),
-  layers.Flatten(),
-  layers.Dense(128, activation='relu'),
-  layers.Dense(num_classes)
-])
-
+model = keras.models.load_model("models/03_16_5:47PM")
 model.summary()
 
-model.compile(optimizer='adam',
-              loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
-              metrics=['accuracy'])
-
-
-epochs=10
-history = model.fit(
-  train_ds,
-  validation_data=val_ds,
-  epochs=epochs
-)
-
 # Testing begins here
-
-# Saving model
-now = dt.datetime.now()
-model_dir="models/{}/".format(now.strftime("%m_%d_%-I:%M%p"))
-model.save(model_dir)
 
 test_path = "datasets/training/glue/glue/2AzfCrPr0nI0qDZ66S9uWvdV9OJ4n5pT_2AzfCrPr0nI0qDZ66S9uWvdV9OJ4n5pT_.png"
 
@@ -96,7 +66,8 @@ print(
     .format(class_names[np.argmax(score)], 100 * np.max(score))
 )
 
-import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
-
-imgplot = plt.imshow(mpimg.imgread(test_path))
+import matplotlib.image as mpimg
+img = mpimg.imread(test_path)
+imgplot = plt.imshow(img)
+plt.show()
