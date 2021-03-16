@@ -9,6 +9,7 @@ from tensorflow.keras import layers
 from tensorflow.keras.models import Sequential
 
 import pathlib
+import datetime as dt
 
 data_dir = "datasets/training/broken_wire"
 data_dir = pathlib.Path(data_dir)
@@ -78,7 +79,10 @@ model.compile(optimizer='adam',
               metrics=['accuracy'])
 
 model.summary()
-
+# Saving model
+now = dt.datetime.now()
+model_dir="models/{}/".format(now.strftime("%m_%d_%-I:%M%p"))
+model.save(model_dir)
 
 epochs=10
 history = model.fit(
@@ -87,6 +91,7 @@ history = model.fit(
   epochs=epochs
 )
 
+# Testing begins here
 
 sunflower_url = "https://storage.googleapis.com/download.tensorflow.org/example_images/592px-Red_sunflower.jpg"
 sunflower_path = tf.keras.utils.get_file('Red_sunflower', origin=sunflower_url)
