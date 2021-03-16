@@ -7,9 +7,14 @@ env/
 .AppleDouble
 .LSOverride
 
+# Don't push the datasets (they're too big.. ) 
 datasets/
 datasets/*.png
 datasets
+
+# Don't push the models. 
+models
+models/
 
 # Icon must end with two \r
 Icon

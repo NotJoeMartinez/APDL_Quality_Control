@@ -10,13 +10,8 @@ from tensorflow.keras.models import Sequential
 
 import pathlib
 
-
-
-
-data_dir = "datasets/train_glue"
+data_dir = "datasets/training/broken_wire"
 data_dir = pathlib.Path(data_dir)
-
-
 
 
 batch_size = 32

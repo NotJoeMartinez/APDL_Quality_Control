@@ -1,15 +1,9 @@
 # APDL_Quality_Control
-This project is intended to help with the quality control process of manufacturing chipsets. I originally started 
-using an image majick python function to compare similar images but that was insufficient as it did not allow 
-any room for small deviations which would be needed in the production environment. 
+This project is intended to help with the quality control process of manufacturing chipsets. 
 
-
-
-### Image_majick
-
-### Outlier_with_alibi
-
-
-
-
-
+## Required features of this application/model 
+- Augment existing datasets 
+- Train model on augmented dataset to detect the presence of errors 
+- More specifically we want it to detect the presence/absence of broken wires 
+    - Save trained models
+    - Deploy trained models in an application setting 
