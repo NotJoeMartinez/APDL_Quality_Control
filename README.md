@@ -12,4 +12,4 @@ This project is intended to help with the quality control process of manufacturi
 
 Example of expected outcome on 10 randomly selected images from our dataset
 
-![image-20210316192927925](/Users/supernova/Dropbox/labwork/APDL_Quality_Control/README.assets/image-20210316192927925.png)
+![image-20210316192927925](README.assets/image-20210316192927925.png)
