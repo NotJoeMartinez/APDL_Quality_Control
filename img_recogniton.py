@@ -79,21 +79,5 @@ now = dt.datetime.now()
 model_dir="models/{}/".format(now.strftime("%m_%d_%-I:%M%p"))
 model.save(model_dir)
 
-test_path = "datasets/training/glue/glue/2AzfCrPr0nI0qDZ66S9uWvdV9OJ4n5pT_2AzfCrPr0nI0qDZ66S9uWvdV9OJ4n5pT_.png"
-
-img = keras.preprocessing.image.load_img(
-    test_path, target_size=(img_height, img_width)
-)
-
-img_array = keras.preprocessing.image.img_to_array(img)
-img_array = tf.expand_dims(img_array, 0) # Create a batch
-
-predictions = model.predict(img_array)
-score = tf.nn.softmax(predictions[0])
-
-print(
-    "This image most likely belongs to {} with a {:.2f} percent confidence."
-    .format(class_names[np.argmax(score)], 100 * np.max(score))
-)
 
 

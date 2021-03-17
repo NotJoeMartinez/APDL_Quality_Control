@@ -25,14 +25,17 @@ class_names = ['broken_wire', 'not_broken_wire']
 fpath = "datasets/testing/test_broken_wire/"
 test_images = [fpath+"broken_wire.png"]
 
-for i in range(0,5):
+for i in range(0,9):
   test_img_path = fpath + random.choice(os.listdir(fpath))
   test_images.append(test_img_path)
 
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
-plt.figure(figsize=(10, 10))
+
+# Builds the plot with images of random images and one image of a broken wire
+
+plt.figure(figsize=(15, 15))
 for count, x in enumerate(test_images):
   img = keras.preprocessing.image.load_img(
       x, target_size=(img_height, img_width)
@@ -44,10 +47,11 @@ for count, x in enumerate(test_images):
   predictions = model.predict(img_array)
   score = tf.nn.softmax(predictions[0])
 
-  ax = plt.subplot(3, 3, count + 1)
+  # plot building 
+  ax = plt.subplot(5, 3, count + 1)
   img = mpimg.imread(x)
   plt.imshow(img)
-  plt.title(class_names[np.argmax(score)])
+  plt.title(class_names[np.argmax(score)] + " {:.2f}".format(100 * np.max(score)))
   plt.axis("off")
 
   print(
