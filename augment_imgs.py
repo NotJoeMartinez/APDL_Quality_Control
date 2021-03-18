@@ -47,19 +47,29 @@ transformations = {
 
 images_path=str(input("normal images path: "))
 augmented_path=str(input("augmented images path: "))
-images=[]  
 
+images=[]  
 # read image name from folder and append its path into "images" array     
 for im in os.listdir(images_path):  
     images.append(os.path.join(images_path,im))
 
 # you can change this value according to your requirement
-images_to_generate=int(input("number of images to generate: "))
-i=1                        
+images_to_generate=input("number of images to generate (Press enter to use default 200 ): ")
 
+if images_to_generate == "":
+    # find the amount of images to generate by subtracting the current amount of image in the directory by 200 
+    images_to_generate = 200 - len(images)
+    print("augmenting {} images".format(images_to_generate))
+
+
+i = 1                        
 while i <= images_to_generate:    
     image = random.choice(images)
-    original_image = io.imread(image)
+    try: 
+        original_image = io.imread(image)
+    except ValueError:
+        pass
+
     transformed_image = None
 
     # variable to iterate till number of transformation to apply
@@ -80,4 +90,4 @@ while i <= images_to_generate:
     transformed_image = cv2.cvtColor(transformed_image, cv2.COLOR_BGR2RGB) 
     # save transformed image to path
     cv2.imwrite(new_image_path, transformed_image) 
-    i =i+1
+    i = i+1

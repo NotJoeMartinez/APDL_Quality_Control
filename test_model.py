@@ -14,8 +14,8 @@ import os, random
 
 
 
-model = keras.models.load_model("models/03_16_6:20PM")
-# model.summary()
+model = keras.models.load_model("models/03_18_1:03PM")
+model.summary()
 
 # Testing begins here
 img_height = 180

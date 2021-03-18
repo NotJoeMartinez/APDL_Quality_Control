@@ -11,7 +11,7 @@ from tensorflow.keras.models import Sequential
 import pathlib
 import datetime as dt
 
-data_dir = "datasets/train_broken_wire"
+data_dir = input("Dataset Training directory: ")
 data_dir = pathlib.Path(data_dir)
 
 
@@ -58,7 +58,7 @@ model = Sequential([
   layers.Dense(num_classes)
 ])
 
-# model.summary()
+model.summary()
 
 model.compile(optimizer='adam',
               loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
@@ -78,6 +78,7 @@ history = model.fit(
 now = dt.datetime.now()
 model_dir="models/{}/".format(now.strftime("%m_%d_%-I:%M%p"))
 model.save(model_dir)
+print("Model for {} training set saved in {}".format(data_dir,model_dir))
 
 
 
