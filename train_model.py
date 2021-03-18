@@ -3,11 +3,9 @@ import numpy as np
 import os
 import PIL
 import tensorflow as tf
-
 from tensorflow import keras
 from tensorflow.keras import layers
 from tensorflow.keras.models import Sequential
-
 import pathlib
 import datetime as dt
 
@@ -19,7 +17,6 @@ batch_size = 32
 img_height = 180
 img_width = 180
 
-print(data_dir, type(data_dir))
 
 train_ds = tf.keras.preprocessing.image_dataset_from_directory(
   data_dir,
@@ -42,8 +39,9 @@ val_ds = tf.keras.preprocessing.image_dataset_from_directory(
 class_names = train_ds.class_names
 print(class_names)
 
-
-num_classes = 2
+# this should be dynamic to the amout of directories there are in data_dir 
+num_classes = sum([len(folder) for r, d, folder in os.walk(data_dir)])
+print("This data directory has {} subdirectorys".format(num_classes))
 
 model = Sequential([
   layers.experimental.preprocessing.Rescaling(1./255, input_shape=(img_height, img_width, 3)),
@@ -58,12 +56,9 @@ model = Sequential([
   layers.Dense(num_classes)
 ])
 
-model.summary()
-
 model.compile(optimizer='adam',
               loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
               metrics=['accuracy'])
-
 
 epochs=10
 history = model.fit(
@@ -72,7 +67,6 @@ history = model.fit(
   epochs=epochs
 )
 
-# Testing begins here
 
 # Saving model
 now = dt.datetime.now()
