@@ -13,20 +13,20 @@ import datetime as dt
 import os, random
 
 
-
-model = keras.models.load_model("models/03_18_1:03PM")
+# load model
+model = keras.models.load_model("models/03_18_3:42PM")
 model.summary()
 
 # Testing begins here
 img_height = 180
 img_width = 180
-class_names = ['broken_wire', 'not_broken_wire']
+class_names = ['broken wire', 'glue', 'good', 'missing wire', 'unknown debris']
 
-fpath = "datasets/testing/test_broken_wire/"
-test_images = [fpath+"broken_wire.png"]
+fpath = input("Testing Path: ")
 
+test_images = []
 for i in range(0,9):
-  test_img_path = fpath + random.choice(os.listdir(fpath))
+  test_img_path = fpath + "/" + random.choice(os.listdir(fpath))
   test_images.append(test_img_path)
 
 import matplotlib.pyplot as plt
@@ -36,11 +36,13 @@ import matplotlib.image as mpimg
 # Builds the plot with images of random images and one image of a broken wire
 
 plt.figure(figsize=(15, 15))
+
 for count, x in enumerate(test_images):
   img = keras.preprocessing.image.load_img(
       x, target_size=(img_height, img_width)
   )
 
+  print(x )
   img_array = keras.preprocessing.image.img_to_array(img)
   img_array = tf.expand_dims(img_array, 0) # Create a batch
 

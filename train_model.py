@@ -40,7 +40,7 @@ class_names = train_ds.class_names
 print(class_names)
 
 # this should be dynamic to the amout of directories there are in data_dir 
-num_classes = sum([len(folder) for r, d, folder in os.walk(data_dir)])
+num_classes =  5 # sum([len(folder) for r, d, folder in os.walk(data_dir)])
 print("This data directory has {} subdirectorys".format(num_classes))
 
 model = Sequential([
@@ -52,9 +52,11 @@ model = Sequential([
   layers.Conv2D(64, 3, padding='same', activation='relu'),
   layers.MaxPooling2D(),
   layers.Flatten(),
-  layers.Dense(128, activation='relu'),
+  # layers.Dense(128, activation='relu'),
   layers.Dense(num_classes)
 ])
+model.summary()
+print("Num Calsses: ",num_classes)
 
 model.compile(optimizer='adam',
               loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
@@ -66,6 +68,7 @@ history = model.fit(
   validation_data=val_ds,
   epochs=epochs
 )
+
 
 
 # Saving model
