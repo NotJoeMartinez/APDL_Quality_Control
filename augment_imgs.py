@@ -8,7 +8,6 @@ from skimage import img_as_ubyte
 import os
 from skimage.util import random_noise
 
-#Lets define functions for each operation
 def anticlockwise_rotation(image):
     angle = random.randint(0,180)
     return rotate(image, angle)
@@ -29,15 +28,14 @@ def add_noise(image):
 def blur_image(image):
     return cv2.GaussianBlur(image, (9,9),0)
 
-#I would not recommend warp_shifting, because it distorts image, but can be used in many use case like 
-#classifying blur and non-blur images
+# classifying blur and non-blur images
 def warp_shift(image): 
     transform = AffineTransform(translation=(0,40))  #chose x,y values according to your convinience
     warp_image = warp(image, transform, mode="wrap")
     return warp_image
 
 
-#use dictionary to store names of functions 
+# use dictionary to store names of functions 
 transformations = {
                       'horizontal flip': h_flip, 
                       'vertical flip': v_flip,
@@ -61,9 +59,10 @@ if images_to_generate == "":
     images_to_generate = 200 - len(images)
     print("augmenting {} images".format(images_to_generate))
 
+print(images_to_generate, type(int(images_to_generate)))
 
 i = 1                        
-while i <= images_to_generate:    
+while i <= int(images_to_generate):    
     image = random.choice(images)
     try: 
         original_image = io.imread(image)
@@ -83,7 +82,7 @@ while i <= images_to_generate:
         transformed_image = transformations[key](original_image)
         n = n + 1
         
-    new_image_path = "{}augmented_image_{}.png".format(augmented_path, i)
+    new_image_path = "{}/augmented_image_{}.png".format(augmented_path, i)
     # Convert an image to unsigned byte format, with values in [0, 255].
     transformed_image = img_as_ubyte(transformed_image)  
     # convert image to RGB before saving it
