@@ -37,7 +37,7 @@ val_ds = tf.keras.preprocessing.image_dataset_from_directory(
   batch_size=batch_size)
 
 class_names = train_ds.class_names
-print(class_names)
+
 
 # this should be dynamic to the amout of directories there are in data_dir 
 num_classes =  5 # sum([len(folder) for r, d, folder in os.walk(data_dir)])
@@ -70,7 +70,6 @@ history = model.fit(
 )
 
 
-
 # Saving model
 now = dt.datetime.now()
 model_dir="models/{}/".format(now.strftime("%m_%d_%-I:%M%p"))
@@ -78,4 +77,28 @@ model.save(model_dir)
 print("Model for {} training set saved in {}".format(data_dir,model_dir))
 
 
+def show_model_details():
+  acc = history.history['accuracy']
+  val_acc = history.history['val_accuracy']
 
+  loss = history.history['loss']
+  val_loss = history.history['val_loss']
+
+  epochs_range = range(epochs)
+
+  plt.figure(figsize=(8, 8))
+  plt.subplot(1, 2, 1)
+  plt.plot(epochs_range, acc, label='Training Accuracy')
+  plt.plot(epochs_range, val_acc, label='Validation Accuracy')
+  plt.legend(loc='lower right')
+  plt.title('Training and Validation Accuracy')
+
+  plt.subplot(1, 2, 2)
+  plt.plot(epochs_range, loss, label='Training Loss')
+  plt.plot(epochs_range, val_loss, label='Validation Loss')
+  plt.legend(loc='upper right')
+  plt.title('Training and Validation Loss')
+  plt.show()
+
+
+show_model_details()
