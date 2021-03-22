@@ -10,23 +10,19 @@ import datetime as dt
 
 
 # load model
-model = keras.models.load_model("models/03_18_3:42PM")
+model = keras.models.load_model("models/03_22_3:36PM")
 model.summary()
 
-
-data_dir = input("Data direcotry: ")
-
-# Testing begins here
 img_height = 180
 img_width = 180
 class_names = ['broken wire', 'glue', 'good', 'missing wire', 'unknown debris']
 fpath = input("Testing Path: ")
 
-import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
 # Builds the plot with images of random images and one image of a broken wire
 def old_testing():
-  # randomly pick images
+  import matplotlib.pyplot as plt
+  import matplotlib.image as mpimg
+
   test_images = []
   for i in range(0,9):
     test_img_path = fpath + "/" + random.choice(os.listdir(fpath))
@@ -38,10 +34,8 @@ def old_testing():
         x, target_size=(img_height, img_width)
     )
 
-    print(x )
     img_array = keras.preprocessing.image.img_to_array(img)
-    img_array = tf.expand_dims(img_array, 0) # Create a batch
-
+    img_array = tf.expand_dims(img_array, 0) 
     predictions = model.predict(img_array)
     score = tf.nn.softmax(predictions[0])
 
@@ -52,11 +46,6 @@ def old_testing():
     plt.title(class_names[np.argmax(score)] + " {:.2f}".format(100 * np.max(score)))
     plt.axis("off")
 
-    print(
-        "This image most likely belongs to {} with a {:.2f} percent confidence."
-        .format(class_names[np.argmax(score)], 100 * np.max(score))
-    )
-
-
   plt.show()
 
+old_testing()
