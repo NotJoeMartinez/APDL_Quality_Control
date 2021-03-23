@@ -53,7 +53,6 @@ test_all_imgs()
 
 # Builds the plot with images of random images and one image of a broken wire
 def random_test_plot():
-
   test_images = []
   for i in range(0,9):
     test_img_path = fpath + "/" + random.choice(os.listdir(fpath))
