@@ -17,7 +17,7 @@ import subprocess
 import pandas as pd 
 
 # load model
-model = keras.models.load_model("models/03_22_3:36PM")
+model = keras.models.load_model("models/03_23_6:23PM")
 # model.summary()
 
 img_height = 180
@@ -98,16 +98,17 @@ def test_all_imgs():
       pass
   return pandas_data 
 
-yeet = test_all_imgs()
-df = pd.DataFrame(yeet, columns = ['prediction','prediction_truth','confidence'])
-print(df)
+# yeet = test_all_imgs()
+# df = pd.DataFrame(yeet, columns = ['prediction','prediction_truth','confidence'])
+# print(df)
 
 
 # Builds the plot with images of random images and one image of a broken wire
 def random_test_plot():
+  test_data_path = "datasets/testing/test_all_features"
   test_images = []
   for i in range(0,9):
-    test_img_path = fpath + "/" + random.choice(os.listdir(fpath))
+    test_img_path = test_data_path + "/" + random.choice(os.listdir(test_data_path))
     test_images.append(test_img_path)
 
   plt.figure(figsize=(15, 15))
@@ -131,3 +132,4 @@ def random_test_plot():
   plt.show()
 
 
+random_test_plot()
