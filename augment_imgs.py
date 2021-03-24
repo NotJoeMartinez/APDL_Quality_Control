@@ -7,8 +7,40 @@ import random
 from skimage import img_as_ubyte
 import os
 from skimage.util import random_noise
+import argparse
+import sys
+import tempfile
+import glob
+import shutil
+from pathlib import Path
+
 
 def main():
+
+    parser = argparse.ArgumentParser(description="augments images of specifed directory to a default of 200 images ")
+
+    parser.add_argument("Path",
+                        metavar="path",
+                        type=str,
+                        help='path to training directory'
+        )
+
+    args = parser.parse_args()
+    root_dir = args.Path
+
+    if not os.path.isdir(root_dir):
+        print('The path specified does not exist')
+        sys.exit()
+    else:
+        target_dirs = os.listdir(root_dir) 
+    
+    for sub_dir in target_dirs: 
+        print(sub_dir)
+        images_path = f"{root_dir}/{sub_dir}"
+        augment(images_path)
+
+
+def augment(images_path):
     # use dictionary to store names of functions 
     transformations = {
                         'horizontal flip': h_flip, 
@@ -17,23 +49,22 @@ def main():
                     'blurring image': blur_image
                     }                
 
-    images_path=str(input("normal images path: "))
-    augmented_path=str(input("augmented images path: "))
+    augmented_path = f"{images_path}/temp/"
+
+    try: 
+        os.mkdir(augmented_path)
+    except FileExistsError:
+        pass
 
     images=[]  
     # read image name from folder and append its path into "images" array     
     for im in os.listdir(images_path):  
         images.append(os.path.join(images_path,im))
 
-    # you can change this value according to your requirement
-    images_to_generate=input("number of images to generate (Press enter to use default 200 ): ")
-
-    if images_to_generate == "":
-        # find the amount of images to generate by subtracting the current amount of image in the directory by 200 
+        # print(images)
         images_to_generate = 200 - len(images)
-        print("augmenting {} images".format(images_to_generate))
+        # print("augmenting {} images".format(images_to_generate))
 
-    print(images_to_generate, type(int(images_to_generate)))
 
     i = 1                        
     while i <= int(images_to_generate):    
@@ -50,13 +81,13 @@ def main():
         # choose random number of transformation to apply on the image
         transformation_count = random.randint(1, len(transformations)) 
 
-        #randomly choosing method to call
+        # randomly choosing method to call
         while n <= transformation_count:
             key = random.choice(list(transformations)) 
             transformed_image = transformations[key](original_image)
             n = n + 1
             
-        new_image_path = "{}/augmented_image_{}.png".format(augmented_path, i)
+        new_image_path = "{}augmented_image_{}.png".format(augmented_path, i)
         # Convert an image to unsigned byte format, with values in [0, 255].
         transformed_image = img_as_ubyte(transformed_image)  
         # convert image to RGB before saving it
@@ -64,6 +95,14 @@ def main():
         # save transformed image to path
         cv2.imwrite(new_image_path, transformed_image) 
         i = i+1
+
+    for aug_file in glob.glob(f"{augmented_path}*.png"):
+        shutil.move(aug_file,images_path)
+
+    try:
+        os.rmdir(augmented_path)
+    except OSError as e:
+        print(f'Error: {augmented_path} : {e.strerror}')
 
 
 
@@ -94,7 +133,9 @@ def warp_shift(image):
     return warp_image
 
 
+
+
+
 if __name__ == '__main__':
     main()
     sys.exit(0)
-
