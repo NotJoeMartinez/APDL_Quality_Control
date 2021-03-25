@@ -11,9 +11,9 @@ import re
 # Augment the remaining images and make sure you're not messing that up 
 
 def main():
-    tree_dict = get_tree_dict("datasets/training")
+    tree_dict = get_tree_dict("datasets/training/")
     move_dict = parse_tree_dict(tree_dict)
-    mv_train_dirs("datasets/training", move_dict)
+    mv_train_dirs("datasets/training/", move_dict)
 
 
 def get_tree_dict(root_path):
@@ -56,8 +56,7 @@ def mv_train_dirs(root_path, move_dict):
         os.makedirs(new_dir, exist_ok=True)
         dst = new_dir 
         src = f"{root_path}/{path}"
-        shutil.copy(src, dst)
-        os.remove(src)
+        shutil.move(src, dst)
 
 
 

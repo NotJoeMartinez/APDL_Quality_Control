@@ -61,9 +61,7 @@ def augment(images_path):
     for im in os.listdir(images_path):  
         images.append(os.path.join(images_path,im))
 
-        # print(images)
         images_to_generate = 200 - len(images)
-        # print("augmenting {} images".format(images_to_generate))
 
 
     i = 1                        

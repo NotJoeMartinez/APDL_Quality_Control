@@ -27,7 +27,6 @@ train_ds = tf.keras.preprocessing.image_dataset_from_directory(
   image_size=(img_height, img_width),
   batch_size=batch_size)
 
-
 val_ds = tf.keras.preprocessing.image_dataset_from_directory(
   data_dir,
   validation_split=0.2,
@@ -40,7 +39,7 @@ class_names = train_ds.class_names
 
 
 # this should be dynamic to the amout of directories there are in data_dir 
-num_classes =  5 # sum([len(folder) for r, d, folder in os.walk(data_dir)])
+num_classes =  7 # sum([len(folder) for r, d, folder in os.walk(data_dir)])
 print("This data directory has {} subdirectorys".format(num_classes))
 
 model = Sequential([
@@ -72,7 +71,7 @@ history = model.fit(
 
 # Saving model
 now = dt.datetime.now()
-model_dir="models/{}/".format(now.strftime("%m_%d_%-I:%M%p"))
+model_dir="models/{}/".format(now.strftime("%m_%d_%-I:%M:%S%p"))
 model.save(model_dir)
 print("Model for {} training set saved in {}".format(data_dir,model_dir))
 

@@ -1,39 +1,65 @@
-import os, random, sqlite3, pathlib, re
+import os, sys, random, pathlib, re
 import PIL
-
 import numpy as np
 import datetime as dt
-
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
 from tensorflow.keras.models import Sequential
-
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
-
 import subprocess
-
 import pandas as pd 
+import datetime as dt
 
-# load model
-model = keras.models.load_model("models/03_23_6:23PM")
-# model.summary()
+def main():
+  model = keras.models.load_model(f"models/{find_most_recent('models')}")
+  test_data_path = "datasets/testing/"
+  train_data_path = "datasets/training/"
 
-img_height = 180
-img_width = 180
-class_names = ['broken wire', 'glue', 'good', 'missing wire', 'unknown debris']
-test_data_paths = "datasets/testing/test_all_features"
-rubric_dict =  {
-  "broken_wire": "broken wire",
-  "glue": "glue",
-  "good": "good",
-  "missing_wire": "missing wire",
-  "unknown_debris": "unknown debris"
-}
+
+  img_height = 180
+  img_width = 180
+  
+  class_names = get_class_names(train_data_path, img_height, img_width)
+  random_test_plot(model, class_names, test_data_path, img_height, img_width)
+
+def find_most_recent(directory):
+  now = dt.datetime.now()
+  dir_list = os.listdir(directory)
+  datetimes = []
+  for x in dir_list:
+    dir_dt = dt.datetime.strptime(x, '%m_%d_%I:%M:%S%p')
+    datetimes.append(dir_dt)
+
+  most_recent = max(dt for dt in datetimes if dt < now)
+  return most_recent.strftime("%m_%d_%-I:%M:%S%p")
+  # return most_recent
+
+# returns class names as an array
+def get_class_names(train_data_path, img_height, img_width):
+
+  batch_size = 32
+
+  train_ds = tf.keras.preprocessing.image_dataset_from_directory(
+    train_data_path,
+    validation_split=0.2,
+    subset="training",
+    seed=123,
+    image_size=(img_height, img_width),
+    batch_size=batch_size)
+  return train_ds.class_names 
 
 # finds image names out of the training dataset then returns their parent directory 
-def find_image_label(img_name, file_path="datasets/training/all_features", ):
+def find_image_label(img_name, file_path="datasets/training/", ):
+  rubric_dict =  {
+    "broken_wire": "broken wire",
+    "glue": "glue",
+    "good": "good",
+    "missing_wire": "missing wire",
+    "unknown_debris": "unknown debris"
+  }
+
   foo = subprocess.check_output("find {} -name {}".format(file_path,img_name) , shell=True)
   parent_dir = re.findall("\/(\w*)\/", str(foo))
   
@@ -42,12 +68,11 @@ def find_image_label(img_name, file_path="datasets/training/all_features", ):
   except IndexError:
     pass
 
-"""
-Itterates through all test images, prints predictions, confidence levels 
-and wheather it actually  predicted it correctly it should return a pandas dataframe
-"""
 def test_all_imgs():
-
+  """
+  Itterates through all test images, prints predictions, confidence levels 
+  and wheather it actually  predicted it correctly it should return a pandas dataframe
+  """
   pandas_data = []
   # makes list of test data paths
   data_paths = []
@@ -102,17 +127,18 @@ def test_all_imgs():
 # df = pd.DataFrame(yeet, columns = ['prediction','prediction_truth','confidence'])
 # print(df)
 
-
 # Builds the plot with images of random images and one image of a broken wire
-def random_test_plot():
-  test_data_path = "datasets/testing/test_all_features"
-  test_images = []
-  for i in range(0,9):
-    test_img_path = test_data_path + "/" + random.choice(os.listdir(test_data_path))
-    test_images.append(test_img_path)
+def random_test_plot(model, class_names, test_data_path, img_height, img_width):
+  all_test_images = []
+  for root, dirs, files in os.walk(test_data_path):
+    for name in files:
+      all_test_images.append(os.path.join(root, name))
+
+  random_test_images = random.choices(all_test_images, k=9)
+
 
   plt.figure(figsize=(15, 15))
-  for count, x in enumerate(test_images):
+  for count, x in enumerate(random_test_images):
     img = keras.preprocessing.image.load_img(
         x, target_size=(img_height, img_width)
     )
@@ -132,4 +158,7 @@ def random_test_plot():
   plt.show()
 
 
-random_test_plot()
+
+if __name__ == '__main__':
+    main()
+    sys.exit(0)
