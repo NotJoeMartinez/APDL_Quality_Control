@@ -14,15 +14,21 @@ import datetime as dt
 
 def main():
   model = keras.models.load_model(f"models/{find_most_recent('models')}")
-  test_data_path = "datasets/testing/"
-  train_data_path = "datasets/training/"
+  print(find_most_recent('models'))
+  test_data_path = "datasets/testing/03_25_7:23:41PM/"
 
+  model.summary()
 
   img_height = 180
   img_width = 180
   
-  class_names = get_class_names(train_data_path, img_height, img_width)
-  random_test_plot(model, class_names, test_data_path, img_height, img_width)
+  class_names = get_class_names(test_data_path, img_height, img_width)
+  print(class_names)
+  # random_test_plot(model, class_names, test_data_path, img_height, img_width)
+  yeet = test_all_imgs(model, test_data_path, img_height, img_width, class_names)
+  df = pd.DataFrame(yeet, columns = ['prediction','prediction_truth','confidence','path'])
+  print(df)
+
 
 def find_most_recent(directory):
   now = dt.datetime.now()
@@ -37,38 +43,20 @@ def find_most_recent(directory):
   # return most_recent
 
 # returns class names as an array
-def get_class_names(train_data_path, img_height, img_width):
+def get_class_names(test_data_path, img_height, img_width):
 
   batch_size = 32
 
   train_ds = tf.keras.preprocessing.image_dataset_from_directory(
-    train_data_path,
-    validation_split=0.2,
-    subset="training",
+    test_data_path,
     seed=123,
     image_size=(img_height, img_width),
     batch_size=batch_size)
+  print(type(train_ds.class_names))
   return train_ds.class_names 
 
-# finds image names out of the training dataset then returns their parent directory 
-def find_image_label(img_name, file_path="datasets/training/", ):
-  rubric_dict =  {
-    "broken_wire": "broken wire",
-    "glue": "glue",
-    "good": "good",
-    "missing_wire": "missing wire",
-    "unknown_debris": "unknown debris"
-  }
 
-  foo = subprocess.check_output("find {} -name {}".format(file_path,img_name) , shell=True)
-  parent_dir = re.findall("\/(\w*)\/", str(foo))
-  
-  try:
-      return "{}".format(parent_dir[1])
-  except IndexError:
-    pass
-
-def test_all_imgs():
+def test_all_imgs(model, test_data_path, img_height, img_width, class_names):
   """
   Itterates through all test images, prints predictions, confidence levels 
   and wheather it actually  predicted it correctly it should return a pandas dataframe
@@ -76,7 +64,7 @@ def test_all_imgs():
   pandas_data = []
   # makes list of test data paths
   data_paths = []
-  for root, dirs, files in os.walk(test_data_paths):
+  for root, dirs, files in os.walk(test_data_path):
     for name in files:
       data_paths.append(os.path.join(root, name))
   
@@ -99,23 +87,20 @@ def test_all_imgs():
     test_file_name = re.findall("\/.*\/(.*\.png)",test_img)
     model_prediction = class_names[np.argmax(score)]
 
+    parent_dir = re.findall("\/(\w*)\/", str(test_img))
+
     # check stuff against reality 
     try:
-      true_file_label = find_image_label(test_file_name[0])
-      if rubric_dict[true_file_label] == model_prediction:
+      # true_file_label = find_image_label(test_file_name[0])
+      if parent_dir[1] == model_prediction:
         prediction_truth = "True" 
       else:
         prediction_truth = "False" 
       
-      # print(
-      #   "Prediction: {}, Truth: {}, Percent Confidence: {:.2f}".format(model_prediction, 
-      #    prediction_truth, 
-      #   100 * np.max(score))
-      # )
-
       temp_data.append(model_prediction) 
       temp_data.append(prediction_truth) 
       temp_data.append(100 * np.max(score)) 
+      temp_data.append(f"{parent_dir[1]}/{test_file_name[0]}")
 
       pandas_data.append(temp_data)
 
@@ -123,9 +108,7 @@ def test_all_imgs():
       pass
   return pandas_data 
 
-# yeet = test_all_imgs()
-# df = pd.DataFrame(yeet, columns = ['prediction','prediction_truth','confidence'])
-# print(df)
+
 
 # Builds the plot with images of random images and one image of a broken wire
 def random_test_plot(model, class_names, test_data_path, img_height, img_width):

@@ -13,20 +13,18 @@ import tempfile
 import glob
 import shutil
 from pathlib import Path
-
+import subprocess
+from scripts import separate_datasets
 
 def main():
 
-    parser = argparse.ArgumentParser(description="augments images of specifed directory to a default of 200 images ")
+    # Remove all .DS_Store from currend dir 
+    subprocess.run("find . -name '.DS_Store' -type f -delete", shell=True)
 
-    parser.add_argument("Path",
-                        metavar="path",
-                        type=str,
-                        help='path to training directory'
-        )
+    root_dir = "datasets/training" 
 
-    args = parser.parse_args()
-    root_dir = args.Path
+    separate_datasets.main()
+
 
     if not os.path.isdir(root_dir):
         print('The path specified does not exist')
@@ -82,7 +80,12 @@ def augment(images_path):
         # randomly choosing method to call
         while n <= transformation_count:
             key = random.choice(list(transformations)) 
-            transformed_image = transformations[key](original_image)
+            try: 
+                transformed_image = transformations[key](original_image)
+            except UnboundLocalError as ue:
+                print(ue)
+                pass
+
             n = n + 1
             
         new_image_path = "{}augmented_image_{}.png".format(augmented_path, i)

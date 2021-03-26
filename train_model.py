@@ -9,7 +9,7 @@ from tensorflow.keras.models import Sequential
 import pathlib
 import datetime as dt
 
-data_dir = input("Dataset Training directory: ")
+data_dir = "datasets/training" 
 data_dir = pathlib.Path(data_dir)
 
 

@@ -36,21 +36,34 @@ def get_tree_dict(root_path):
 def parse_tree_dict(tree_dict):
     move_dict = {}
     for key in tree_dict:
-        r_list = random.choices(tree_dict[key], k=2)
+        # make sure you don't get duplicates
+        while True:
+            r_list = random.choices(tree_dict[key], k=2)
+            if r_list[0] == r_list[1]:
+                r_list = random.choices(tree_dict[key], k=2)
+            else:
+                break
+
+
+                
         move_dict[key] = r_list
     return move_dict
+
+"""
+Moves stuff to testing directory
+"""
         
 def mv_train_dirs(root_path, move_dict):
-    
+
     move_list = []
     for key in move_dict:
         for index in move_dict[key]:
             move_list.append(f"{key}/{index}")
     
 
+    now = dt.datetime.now().strftime("%m_%d_%-I:%M:%S%p")
+
     for path in move_list:
-        now = dt.datetime.now().strftime("%m_%d_%-I:%M:%S%p")
-        # print(path)
         parent_dir = re.findall("^(\w*)\/", path)
         new_dir = f"datasets/testing/{now}/{parent_dir[0]}"
         os.makedirs(new_dir, exist_ok=True)

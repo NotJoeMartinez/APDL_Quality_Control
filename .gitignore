@@ -2,6 +2,7 @@ env
 env/
 .DS_Store
 .VS_Code
+.vscode
 # General
 .DS_Store
 .AppleDouble
