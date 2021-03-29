@@ -11,23 +11,36 @@ import matplotlib.image as mpimg
 import subprocess
 import pandas as pd 
 import datetime as dt
+from PIL import Image, ImageOps
 
 def main():
-  model = keras.models.load_model(f"models/{find_most_recent('models')}")
-  print(find_most_recent('models'))
-  test_data_path = "datasets/testing/03_25_7:23:41PM/"
+  subprocess.run("find . -name '.DS_Store' -type f -delete", shell=True)
+  # model = keras.models.load_model(f"models/{find_most_recent('models')}")
+  model = keras.models.load_model("models/converted_keras/keras_model.h5")
+  test_data_path = "datasets/testing/jpg"
 
   model.summary()
+  class_names = ['Broken Wire', 'Glue', 'Good', 'No Wires', 'One Third Wire', 'Two Third Wires', 'Unknown Debris']
+  random_test_plot(model, class_names, test_data_path)
 
-  img_height = 180
-  img_width = 180
-  
-  class_names = get_class_names(test_data_path, img_height, img_width)
-  print(class_names)
-  # random_test_plot(model, class_names, test_data_path, img_height, img_width)
-  yeet = test_all_imgs(model, test_data_path, img_height, img_width, class_names)
-  df = pd.DataFrame(yeet, columns = ['prediction','prediction_truth','confidence','path'])
-  print(df)
+  # df = pd.DataFrame(yeet, columns = ['prediction','prediction_truth','confidence','path'])
+  # print(df)
+
+
+def bar_chart_prediction(model,):
+  all_test_images = []
+  for root, dirs, files in os.walk(test_data_path):
+    for name in files:
+      all_test_images.append(os.path.join(root, name))
+
+  probability_model = tf.keras.Sequential([model, 
+                                              tf.keras.layers.Softmax()])
+  predictions = probability_model.predict()
+
+
+def quick_maths(df):
+  for i in df.items():
+    print(i, type(i))
 
 
 def find_most_recent(directory):
@@ -52,7 +65,6 @@ def get_class_names(test_data_path, img_height, img_width):
     seed=123,
     image_size=(img_height, img_width),
     batch_size=batch_size)
-  print(type(train_ds.class_names))
   return train_ds.class_names 
 
 
@@ -103,43 +115,63 @@ def test_all_imgs(model, test_data_path, img_height, img_width, class_names):
       temp_data.append(f"{parent_dir[1]}/{test_file_name[0]}")
 
       pandas_data.append(temp_data)
-
+      print(temp_data)
     except (IndexError, KeyError):
       pass
+  print(pandas_data)
   return pandas_data 
 
 
+def plot_value_array(predictions_array, class_names):
+    plt.grid(False)
+    plt.xticks(range(7))
+    plt.yticks([])
+    thisplot = plt.bar(range(7), predictions_array, color="#777777")
+    plt.ylim([0, 1])
+    predicted_label = np.argmax(predictions_array)
+    thisplot[predicted_label].set_color('red')
+
+
+def plot_image(predictions_array, class_names, img_array):
+  plt.grid(False)
+  plt.xticks([])
+  plt.yticks([])
+  plt.imshow(img_array, cmap=plt.cm.binary)
+  predicted_label = np.argmax(predictions_array)
+  plt.xlabel("{} {:2.0f}%".format(class_names[predicted_label],
+                                100*np.max(predictions_array)))
 
 # Builds the plot with images of random images and one image of a broken wire
-def random_test_plot(model, class_names, test_data_path, img_height, img_width):
-  all_test_images = []
-  for root, dirs, files in os.walk(test_data_path):
-    for name in files:
-      all_test_images.append(os.path.join(root, name))
+def random_test_plot(model, class_names, test_data_path):
 
-  random_test_images = random.choices(all_test_images, k=9)
+    data_paths = []
+    for root, dirs, files in os.walk(test_data_path):
+        for name in files:
+            data_paths.append(os.path.join(root, name))
 
+    random_test_images = random.choices(data_paths, k=9)
+    num_rows = 3
+    num_cols = 3
+    num_images = num_rows*num_cols
+    size = (224, 224)
+    plt.figure(figsize=(2*2*num_cols, 2*num_rows))
+    for i, img_path in enumerate(random_test_images):
+        data = np.ndarray(shape=(1, 224, 224, 3), dtype=np.float32)
+        image = Image.open(img_path)
+        image = ImageOps.fit(image, size, Image.ANTIALIAS)
+        image_array = np.asarray(image)
+        normalized_image_array = (image_array.astype(np.float32) / 127.0) - 1
+        data[0] = normalized_image_array
+        prediction = model.predict(data)
 
-  plt.figure(figsize=(15, 15))
-  for count, x in enumerate(random_test_images):
-    img = keras.preprocessing.image.load_img(
-        x, target_size=(img_height, img_width)
-    )
+        plt.subplot(num_rows, 2*num_cols, 2*i+1)
+        plot_image(prediction[0], class_names, image_array)
+        plt.subplot(num_rows, 2*num_cols, 2*i+2)
+        plot_value_array(prediction[0], class_names)
+        _ = plt.xticks(range(7), class_names, rotation=90)
 
-    img_array = keras.preprocessing.image.img_to_array(img)
-    img_array = tf.expand_dims(img_array, 0) 
-    predictions = model.predict(img_array)
-    score = tf.nn.softmax(predictions[0])
-
-    # plot building 
-    ax = plt.subplot(5, 3, count + 1)
-    img = mpimg.imread(x)
-    plt.imshow(img)
-    plt.title(class_names[np.argmax(score)] + " {:.2f}".format(100 * np.max(score)))
-    plt.axis("off")
-
-  plt.show()
-
+    plt.tight_layout()
+    plt.show()
 
 
 if __name__ == '__main__':

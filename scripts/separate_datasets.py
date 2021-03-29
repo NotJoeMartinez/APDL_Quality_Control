@@ -65,7 +65,8 @@ def mv_train_dirs(root_path, move_dict):
 
     for path in move_list:
         parent_dir = re.findall("^(\w*)\/", path)
-        new_dir = f"datasets/testing/{now}/{parent_dir[0]}"
+        # new_dir = f"datasets/testing/{now}/{parent_dir[0]}"
+        new_dir = f"datasets/testing/{parent_dir[0]}"
         os.makedirs(new_dir, exist_ok=True)
         dst = new_dir 
         src = f"{root_path}/{path}"

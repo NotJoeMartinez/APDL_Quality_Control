@@ -44,7 +44,10 @@ def augment(images_path):
                         'horizontal flip': h_flip, 
                         'vertical flip': v_flip,
                     'adding noise': add_noise,
-                    'blurring image': blur_image
+                    'blurring image': blur_image,
+                    'anticlockwise rotation':anticlockwise_rotation, 
+                    'clockwise rotation': clockwise_rotation,
+                    
                     }                
 
     augmented_path = f"{images_path}/temp/"
