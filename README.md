@@ -10,6 +10,7 @@ This project is intended to help with the quality control process of manufacturi
 
 
 
-Example of expected outcome on 10 randomly selected images from our dataset
+Example of expected outcome on 9 randomly selected images from our dataset
 
-![image-20210316192927925](README.assets/image-20210316192927925.png)
+![fig_one](README.assets/Figure_1.png)
+
