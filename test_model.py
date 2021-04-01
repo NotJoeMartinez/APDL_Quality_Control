@@ -21,21 +21,18 @@ def main():
   model.summary()
   class_names = ['Broken Wire', 'Glue', 'Good', 'No Wires', 'One Third Wire', 'Two Third Wires', 'Unknown Debris']
   # random_test_plot(model, class_names, test_data_path)
-  yeet = test_all_imgs(model, class_names, test_data_path) 
-  df = pd.DataFrame(yeet, columns = ['prediction','prediction_truth','confidence','path'])
-  quick_maths(df)
+  tested_images = test_all_imgs(model, class_names, test_data_path) 
+  df = pd.DataFrame(tested_images, columns = ['predicted','actual','confidence','path'])
+  plot_confusion_matrix(df)  
 
 
-def quick_maths(df):
+def plot_confusion_matrix(df):
+  import seaborn as sn
 
-  print(df)
-  total = len(df)
-  correct = df.prediction_truth.str.count('True').sum()
-  incorrect = df.prediction_truth.str.count('False').sum()
-  accuracy = 100 * (correct / total )
-  print(f"Correct: {correct}, \n Incorrect: {incorrect}, \n Total: {total}, \n Accuracy: {accuracy}")
-
-
+  confusion_matrix = pd.crosstab(df['predicted'], df['actual'], rownames=['Predicted'], colnames=['Actual'])
+  sn.heatmap(confusion_matrix, annot=True)
+  plt.fi
+  plt.show()
 
 
 
@@ -80,7 +77,7 @@ def test_all_imgs(model, class_names, test_data_path):
   'good': 'Good', 
   'no_wires': 'No Wires', 
   'one_thirds_wires': 'One Third Wire', 
-  'two_thrid_wires': 'Two Third Wires', 
+  'two_thirds_wires': 'Two Third Wires', 
   'unknown_debris': 'Unknown Debris'}
   
   pandas_data = []
@@ -109,11 +106,14 @@ def test_all_imgs(model, class_names, test_data_path):
     parent_dir = re.findall("\/(\w*)\/", img_path)
 
     # check stuff against reality 
-    if rubric[parent_dir[1]] == class_names[label_prediction]:
-      prediction_truth = "True" 
-    else:
-      prediction_truth = "False" 
-    
+    # if rubric[parent_dir[1]] == class_names[label_prediction]:
+    #   prediction_truth = "True" 
+    # else:
+    #   prediction_truth = "False" 
+
+    # find the parent directory applying it to the rubric then get the index of the class name
+    prediction_truth_index = class_names.index(rubric[parent_dir[1]])
+    prediction_truth = class_names[prediction_truth_index]
     temp_data.append(class_names[label_prediction]) 
     temp_data.append(prediction_truth) 
     temp_data.append(100 * np.max(prediction[0])) 
@@ -124,7 +124,6 @@ def test_all_imgs(model, class_names, test_data_path):
   return pandas_data 
 
 
-
 # Builds the plot with images of random images and one image of a broken wire
 def random_test_plot(model, class_names, test_data_path):
     data_paths = []
@@ -132,7 +131,7 @@ def random_test_plot(model, class_names, test_data_path):
         for name in files:
             data_paths.append(os.path.join(root, name))
 
-    random_test_images = random.choices(data_paths, k=9)
+    random_test_images = random.choices(data_paths, k=6)
     num_rows = 3
     num_cols = 3
     num_images = num_rows*num_cols
