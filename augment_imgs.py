@@ -20,6 +20,8 @@ def main():
 
     # Remove all .DS_Store from currend dir 
     subprocess.run("find . -name '.DS_Store' -type f -delete", shell=True)
+    # copies original dataset to training dataset
+    subprocess.run("cp -r datasets/original/ datasets/training/", shell=True)
 
     root_dir = "datasets/training" 
 
@@ -36,6 +38,8 @@ def main():
         print(sub_dir)
         images_path = f"{root_dir}/{sub_dir}"
         augment(images_path)
+
+
 
 
 def augment(images_path):
@@ -91,7 +95,7 @@ def augment(images_path):
 
             n = n + 1
             
-        new_image_path = "{}augmented_image_{}.png".format(augmented_path, i)
+        new_image_path = "{}augmented_image_{}.jpg".format(augmented_path, i)
         # Convert an image to unsigned byte format, with values in [0, 255].
         transformed_image = img_as_ubyte(transformed_image)  
         # convert image to RGB before saving it
@@ -100,7 +104,7 @@ def augment(images_path):
         cv2.imwrite(new_image_path, transformed_image) 
         i = i+1
 
-    for aug_file in glob.glob(f"{augmented_path}*.png"):
+    for aug_file in glob.glob(f"{augmented_path}*.jpg"):
         shutil.move(aug_file,images_path)
 
     try:
