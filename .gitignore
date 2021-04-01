@@ -11,9 +11,11 @@ env/
 test.py
 
 # Don't push the datasets (they're too big.. ) 
-datasets/
-datasets/*.png
-datasets
+datasets/testing/**/*.jpg
+datasets/testing/**/*.png
+datasets/training/**/*.png
+datasets/training/**/*.jpg
+
 
 # Don't push the models. 
 models

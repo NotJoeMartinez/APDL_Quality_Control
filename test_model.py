@@ -29,11 +29,11 @@ def main():
 def plot_confusion_matrix(df):
   import seaborn as sn
 
+  print(df)
   confusion_matrix = pd.crosstab(df['predicted'], df['actual'], rownames=['Predicted'], colnames=['Actual'])
   sn.heatmap(confusion_matrix, annot=True)
-  plt.fi
+  # plt.fi
   plt.show()
-
 
 
 def find_most_recent(directory):
