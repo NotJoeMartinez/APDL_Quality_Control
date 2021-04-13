@@ -17,6 +17,7 @@ def main():
   subprocess.run("find . -name '.DS_Store' -type f -delete", shell=True)
   model = keras.models.load_model(f"models/{find_most_recent('models')}")
   # model = keras.models.load_model("tests/converted_keras/keras_model.h5")
+  # model = keras.models.load_model("models/saved_flowers_model_mobilenet_v3_small_100_224/")
   test_data_path = "datasets/testing/"
   model.summary()
   class_names = ['Broken Wire', 'Glue', 'Good', 'No Wires', 'One Third Wire', 'Two Third Wires', 'Unknown Debris']
