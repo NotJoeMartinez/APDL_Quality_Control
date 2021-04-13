@@ -15,9 +15,9 @@ from PIL import Image, ImageOps
 
 def main():
   subprocess.run("find . -name '.DS_Store' -type f -delete", shell=True)
-  # model = keras.models.load_model(f"models/{find_most_recent('models')}")
-  model = keras.models.load_model("models/converted_keras/keras_model.h5")
-  test_data_path = "datasets/testing/jpg"
+  model = keras.models.load_model(f"models/{find_most_recent('models')}")
+  # model = keras.models.load_model("tests/converted_keras/keras_model.h5")
+  test_data_path = "datasets/testing/"
   model.summary()
   class_names = ['Broken Wire', 'Glue', 'Good', 'No Wires', 'One Third Wire', 'Two Third Wires', 'Unknown Debris']
   # random_test_plot(model, class_names, test_data_path)
@@ -34,7 +34,6 @@ def plot_confusion_matrix(df):
   sn.heatmap(confusion_matrix, annot=True)
   # plt.fi
   plt.show()
-
 
 def find_most_recent(directory):
   now = dt.datetime.now()
@@ -77,7 +76,7 @@ def test_all_imgs(model, class_names, test_data_path):
   'good': 'Good', 
   'no_wires': 'No Wires', 
   'one_thirds_wires': 'One Third Wire', 
-  'two_thirds_wires': 'Two Third Wires', 
+  'two_thirds_wire': 'Two Third Wires', 
   'unknown_debris': 'Unknown Debris'}
   
   pandas_data = []
@@ -101,9 +100,12 @@ def test_all_imgs(model, class_names, test_data_path):
     prediction = model.predict(data)
     label_prediction = np.argmax(prediction[0])
     
+    print(img_path)
     # find test image path parent
     test_file_name = re.findall("\/.*\/(.*\.jpg)", img_path)
-    parent_dir = re.findall("\/(\w*)\/", img_path)
+    print("test file name: ", test_file_name)
+    parent_dir = re.findall("\/.*\/(.*)\/.*\/*.jpg", img_path)
+    print("Parent Dir: ",parent_dir)
 
     # check stuff against reality 
     # if rubric[parent_dir[1]] == class_names[label_prediction]:
@@ -112,12 +114,12 @@ def test_all_imgs(model, class_names, test_data_path):
     #   prediction_truth = "False" 
 
     # find the parent directory applying it to the rubric then get the index of the class name
-    prediction_truth_index = class_names.index(rubric[parent_dir[1]])
+    prediction_truth_index = class_names.index(rubric[parent_dir[0]])
     prediction_truth = class_names[prediction_truth_index]
     temp_data.append(class_names[label_prediction]) 
     temp_data.append(prediction_truth) 
     temp_data.append(100 * np.max(prediction[0])) 
-    temp_data.append(f"{parent_dir[1]}/{test_file_name[0]}")
+    temp_data.append(f"{parent_dir[0]}/{test_file_name[0]}")
 
     pandas_data.append(temp_data)
   

@@ -13,7 +13,7 @@ data_dir = "datasets/training"
 data_dir = pathlib.Path(data_dir)
 
 
-batch_size = 32
+batch_size = 16
 img_height = 224
 img_width = 224
 
@@ -51,9 +51,16 @@ model = Sequential([
   layers.Conv2D(64, 3, padding='same', activation='relu'),
   layers.MaxPooling2D(),
   layers.Flatten(),
-  # layers.Dense(128, activation='relu'),
+  layers.Dense(128, activation='relu'),
   layers.Dense(num_classes)
 ])
+# model = Sequential ([
+#     layers.experimental.preprocessing.Rescaling(1./255, input_shape=(img_height, img_width, 3)),
+#     layers.Conv2D(64, 3, padding='same', activation='relu' ),
+#     layers.MaxPooling2D(),
+#     layers.Conv2D(64, 3, padding='same', activation='relu'),
+# ])
+
 model.summary()
 print("Num Calsses: ",num_classes)
 
@@ -61,7 +68,7 @@ model.compile(optimizer='adam',
               loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
               metrics=['accuracy'])
 
-epochs=10
+epochs=20
 history = model.fit(
   train_ds,
   validation_data=val_ds,

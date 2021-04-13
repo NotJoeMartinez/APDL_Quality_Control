@@ -8,7 +8,7 @@ each has a child directory that corresponds to it's name.
 - `training/` is contains augmented & original images, each sub directory should have over a hundred images
 - `testing/` contains images separated from training before augmentation and each sub directory should have at least two images
 
-### `models`
+### `models/`
 This is where models are saved after training and retrieved for testing.
 `train_model.py` models will save the Teserflow model in a directory with the
 format `MM_DD_H:MM:SSAM/PM`. 
