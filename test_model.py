@@ -21,11 +21,10 @@ def main():
   test_data_path = "datasets/testing/"
   model.summary()
   class_names = ['Broken Wire', 'Glue', 'Good', 'No Wires', 'One Third Wire', 'Two Third Wires', 'Unknown Debris']
-  # random_test_plot(model, class_names, test_data_path)
+  random_test_plot(model, class_names, test_data_path)
   tested_images = test_all_imgs(model, class_names, test_data_path) 
   df = pd.DataFrame(tested_images, columns = ['predicted','actual','confidence','path'])
   plot_confusion_matrix(df)  
-
 
 def plot_confusion_matrix(df):
   import seaborn as sn
@@ -119,7 +118,8 @@ def test_all_imgs(model, class_names, test_data_path):
     prediction_truth = class_names[prediction_truth_index]
     temp_data.append(class_names[label_prediction]) 
     temp_data.append(prediction_truth) 
-    temp_data.append(100 * np.max(prediction[0])) 
+    # temp_data.append(100 * np.max(prediction[0])) 
+    temp_data.append(np.max(prediction[0])) 
     temp_data.append(f"{parent_dir[0]}/{test_file_name[0]}")
 
     pandas_data.append(temp_data)

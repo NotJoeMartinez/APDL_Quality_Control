@@ -13,7 +13,6 @@ print("TF version:", tf.__version__)
 print("Hub version:", hub.__version__)
 print("GPU is", "available" if tf.test.is_gpu_available() else "NOT AVAILABLE")
 
-
 model_name = "mobilenet_v3_small_100_224" # @param ['bit_s-r50x1', 'efficientnet_b0', 'efficientnet_b1', 'efficientnet_b2', 'efficientnet_b3', 'efficientnet_b4', 'efficientnet_b5', 'efficientnet_b6', 'efficientnet_b7', 'inception_v3', 'inception_resnet_v2', 'mobilenet_v2_100_224', 'mobilenet_v2_130_224', 'mobilenet_v2_140_224', 'mobilenet_v3_large_100_224', 'mobilenet_v3_large_075_224', 'mobilenet_v3_small_100_224', 'mobilenet_v3_small_075_224', 'nasnet_large', 'nasnet_mobile', 'pnasnet_large', 'resnet_v1_50', 'resnet_v1_101', 'resnet_v1_152', 'resnet_v2_50', 'resnet_v2_101', 'resnet_v2_152']
 # mobilenet_v3_large_100_224
 # model_name = "mobilenet_v3_large_100_224"
@@ -72,7 +71,6 @@ print(f"Input size {IMAGE_SIZE}")
 
 BATCH_SIZE = 32 #@param {type:"integer"}
 
-
 ## Set up the dataset
 data_dir = "datasets/training" 
 data_dir = pathlib.Path(data_dir)
@@ -98,7 +96,6 @@ else:
   train_datagen = valid_datagen
 train_generator = train_datagen.flow_from_directory(
     data_dir, subset="training", shuffle=True, **dataflow_kwargs)
-
 ## Defining the model
 do_fine_tuning = False #@param {type:"boolean"}
 print("Building model with", model_handle)
@@ -114,7 +111,6 @@ model = tf.keras.Sequential([
 model.build((None,)+IMAGE_SIZE+(3,))
 model.summary()
 
-
 ## Training the model
 model.compile(
   optimizer=tf.keras.optimizers.SGD(lr=0.005, momentum=0.9), 
@@ -129,7 +125,6 @@ hist = model.fit(
     epochs=10, steps_per_epoch=steps_per_epoch,
     validation_data=valid_generator,
     validation_steps=validation_steps).history
-
 
 plt.figure()
 plt.ylabel("Loss (training and validation)")
