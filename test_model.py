@@ -18,11 +18,11 @@ def main():
   model = keras.models.load_model(f"models/{find_most_recent('models')}")
   # model = keras.models.load_model("tests/converted_keras/keras_model.h5")
   # model = keras.models.load_model("models/saved_flowers_model_mobilenet_v3_small_100_224/")
-  test_data_path = "datasets/testing/"
+  test_data_path = "datasets/augmented_og/"
   model.summary()
   class_names = ['Broken Wire', 'Glue', 'Good', 'No Wires', 'One Third Wire', 'Two Third Wires', 'Unknown Debris']
   random_test_plot(model, class_names, test_data_path)
-  tested_images = test_all_imgs(model, class_names, test_data_path) 
+  # tested_images = test_all_imgs(model, class_names, test_data_path) 
   df = pd.DataFrame(tested_images, columns = ['predicted','actual','confidence','path'])
   plot_confusion_matrix(df)  
 

@@ -11,6 +11,12 @@ source env/bin/activate
 pip install -r requirements.txt
 ```
 
+If you still get an error installing tenserflow deactivate and remove
+```bash
+pip install --upgrade tensorflow
+```
+
+
 ### Using the existing dataset
 To use the classified dataset found `datasets/original.tar.gz`  use the linux `tar` command.
 ```bash
