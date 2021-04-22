@@ -126,7 +126,6 @@ def test_all_imgs(model, class_names, test_data_path):
   
   return pandas_data 
 
-
 # Builds the plot with images of random images and one image of a broken wire
 def random_test_plot(model, class_names, test_data_path):
     data_paths = []
