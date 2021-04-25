@@ -18,13 +18,13 @@ from scripts import separate_datasets
 
 def main():
 
-    # Remove all .DS_Store from currend dir 
-    subprocess.run("find . -name '.DS_Store' -type f -delete", shell=True)
+    # Remove all dotfiles from currend dir 
+    subprocess.run("find original -type f -name '\.*' -delete", shell=True)
 
     # copies original dataset to training dataset
     subprocess.run("cp -r datasets/original/ datasets/training/", shell=True)
 
-    root_dir = "datasets/training" 
+    root_dir = "datasets/training/" 
 
     separate_datasets.main()
 
