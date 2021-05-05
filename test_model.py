@@ -16,13 +16,14 @@ from PIL import Image, ImageOps
 def main():
   subprocess.run("find . -name '.DS_Store' -type f -delete", shell=True)
   model = keras.models.load_model(f"models/{find_most_recent('models')}")
+  print(model)
   # model = keras.models.load_model("tests/converted_keras/keras_model.h5")
   # model = keras.models.load_model("models/saved_flowers_model_mobilenet_v3_small_100_224/")
   test_data_path = "datasets/augmented_og/"
   model.summary()
   class_names = ['Broken Wire', 'Glue', 'Good', 'No Wires', 'One Third Wire', 'Two Third Wires', 'Unknown Debris']
-  random_test_plot(model, class_names, test_data_path)
-  # tested_images = test_all_imgs(model, class_names, test_data_path) 
+  # random_test_plot(model, class_names, test_data_path)
+  tested_images = test_all_imgs(model, class_names, test_data_path) 
   df = pd.DataFrame(tested_images, columns = ['predicted','actual','confidence','path'])
   plot_confusion_matrix(df)  
 
@@ -90,8 +91,8 @@ def test_all_imgs(model, class_names, test_data_path):
   
   for count, img_path in enumerate(data_paths):
     temp_data = []
-    size = (224, 224)
-    data = np.ndarray(shape=(1, 224, 224, 3), dtype=np.float32)
+    size = (480, 480)
+    data = np.ndarray(shape=(1, 480, 480, 3), dtype=np.float32)
     image = Image.open(img_path)
     image = ImageOps.fit(image, size, Image.ANTIALIAS)
     image_array = np.asarray(image)
@@ -103,9 +104,9 @@ def test_all_imgs(model, class_names, test_data_path):
     print(img_path)
     # find test image path parent
     test_file_name = re.findall("\/.*\/(.*\.jpg)", img_path)
-    print("test file name: ", test_file_name)
+    # print("test file name: ", test_file_name)
     parent_dir = re.findall("\/.*\/(.*)\/.*\/*.jpg", img_path)
-    print("Parent Dir: ",parent_dir)
+    # print("Parent Dir: ",parent_dir)
 
     # check stuff against reality 
     # if rubric[parent_dir[1]] == class_names[label_prediction]:
@@ -137,10 +138,10 @@ def random_test_plot(model, class_names, test_data_path):
     num_rows = 3
     num_cols = 3
     num_images = num_rows*num_cols
-    size = (224, 224)
+    size = (480, 480)
     plt.figure(figsize=(2*2*num_cols, 2*num_rows))
     for i, img_path in enumerate(random_test_images):
-        data = np.ndarray(shape=(1, 224, 224, 3), dtype=np.float32)
+        data = np.ndarray(shape=(1, 480, 480, 3), dtype=np.float32)
         image = Image.open(img_path)
         image = ImageOps.fit(image, size, Image.ANTIALIAS)
         image_array = np.asarray(image)

@@ -14,8 +14,8 @@ data_dir = pathlib.Path(data_dir)
 
 
 batch_size = 16
-img_height = 224
-img_width = 224
+img_height = 480 
+img_width = 480 
 
 
 train_ds = tf.keras.preprocessing.image_dataset_from_directory(
