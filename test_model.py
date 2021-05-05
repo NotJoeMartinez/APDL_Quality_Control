@@ -13,32 +13,53 @@ import pandas as pd
 import datetime as dt
 from PIL import Image, ImageOps
 
-def main():
-  subprocess.run("find . -name '.DS_Store' -type f -delete", shell=True)
-  model = keras.models.load_model(f"models/{find_most_recent('models')}")
-  print(find_most_recent('models'))
-  # model = keras.models.load_model("tests/converted_keras/keras_model.h5")
-  # model = keras.models.load_model("models/saved_flowers_model_mobilenet_v3_small_100_456/")
-  test_data_path = "datasets/testing/"
+subprocess.run("find . -name '.DS_Store' -type f -delete", shell=True)
+test_data_path = "datasets/testing/"
+class_names = ['Broken Wire', 'Glue', 'Good', 'No Wires', 'One Third Wire', 'Two Third Wires', 'Unknown Debris']
+
+def main(make_notes=True, class_names=class_names, test_data_path=test_data_path):
+
+  most_recent_model = find_most_recent('models') # finds most recent model
+  model = keras.models.load_model(f"models/{most_recent_model}") # loads most recent model
+  
   model.summary()
-  class_names = ['Broken Wire', 'Glue', 'Good', 'No Wires', 'One Third Wire', 'Two Third Wires', 'Unknown Debris']
-  random_test_plot(model, class_names, test_data_path)
+
+  # for confusion matrix
   tested_images = test_all_imgs(model, class_names, test_data_path) 
   df = pd.DataFrame(tested_images, columns = ['predicted','actual','confidence','path'])
-  plot_confusion_matrix(df)  
+  plot_confusion_matrix(df,fig_name=f"notes/imgs/{most_recent_model}", show=True)  
+
+  if make_notes == True:
+    make_md_notes(most_recent_model, model, df)
 
 
 
+""""Makes a markdown summary in notes/{model_name.md}"""
+def make_md_notes(model_name, model, df):
+  import markdown
+  from contextlib import redirect_stdout
 
-def plot_confusion_matrix(df):
-  import seaborn as sn
+  with open(f"notes/{model_name}.md", 'w') as f:
+    f.write(f"## {model_name} \n")
 
-  print(df)
-  confusion_matrix = pd.crosstab(df['predicted'], df['actual'], rownames=['Predicted'], colnames=['Actual'])
-  sn.heatmap(confusion_matrix, annot=True)
-  # plt.fi
-  plt.show()
+    f.write(f"### Model Summary \n")
+    f.write("```")
+    with redirect_stdout(f):
+        model.summary()
+    f.write("``` \n") 
 
+    f.write(f"### Confusion Matrix \n")
+    f.write(f"![Confusion Matrix](imgs/{model_name}.png) \n")
+
+    f.write(f"### Dataframe predictions \n")
+    f.write("```")
+    with redirect_stdout(f):
+      print(df)
+    f.write("```")
+
+
+
+""" Finds and returns the most recent model in the models directory """ 
 def find_most_recent(directory):
   now = dt.datetime.now()
   dir_list = os.listdir(directory)
@@ -48,9 +69,26 @@ def find_most_recent(directory):
     datetimes.append(dir_dt)
 
   most_recent = max(dt for dt in datetimes if dt < now)
-  return most_recent.strftime("%m_%d_%-I:%M:%S%p")
-  # return most_recent
+  mr = most_recent.strftime("%m_%d_%-I:%M:%S%p")
+  print(mr)
+  return mr
 
+
+
+""" Plots a confusion matrix and saves it to notes/imgs/{model_name.png}"""
+def plot_confusion_matrix(df, fig_name="", show=False):
+  import seaborn as sn
+  fig, ax = plt.subplots(figsize=(20, 10))
+  confusion_matrix = pd.crosstab(df['predicted'], df['actual'], rownames=['Predicted'], colnames=['Actual'])
+
+  sn.heatmap(confusion_matrix, annot=True, ax=ax)
+  plt.savefig(fig_name)
+
+  if show == True:
+    plt.show()
+
+
+""" Plots prediction in a bar chart format with the red bar being the best guess"""
 def plot_value_array(predictions_array, class_names):
   plt.grid(False)
   plt.xticks(range(7))
@@ -60,6 +98,9 @@ def plot_value_array(predictions_array, class_names):
   predicted_label = np.argmax(predictions_array)
   thisplot[predicted_label].set_color('red')
 
+
+
+""" Plots the image in which the model is making predictions on and the percentage certanty """
 def plot_image(predictions_array, class_names, img_array):
   plt.grid(False)
   plt.xticks([])
@@ -69,11 +110,14 @@ def plot_image(predictions_array, class_names, img_array):
   plt.xlabel("{} {:2.0f}%".format(class_names[predicted_label],
                                 100*np.max(predictions_array)))
 
-def test_all_imgs(model, class_names, test_data_path):
+
+
   """
   Itterates through all test images, prints predictions, confidence levels 
   and wheather it actually  predicted it correctly it should return a pandas dataframe
   """
+def test_all_imgs(model, class_names, test_data_path):
+
   rubric = {
   'broken_wire': 'Broken Wire', 
   'glue': 'Glue', 
@@ -102,21 +146,13 @@ def test_all_imgs(model, class_names, test_data_path):
     normalized_image_array = (image_array.astype(np.float32) / 127.0) - 1
     data[0] = normalized_image_array
     prediction = model.predict(data)
-    print(prediction)
     label_prediction = np.argmax(prediction[0])
     
-    print(img_path)
     # find test image path parent
     test_file_name = re.findall("\/.*\/(.*\.jpg)", img_path)
     # print("test file name: ", test_file_name)
     parent_dir = re.findall("\/.*\/(.*)\/.*\/*.jpg", img_path)
     # print("Parent Dir: ",parent_dir)
-
-    # check stuff against reality 
-    # if rubric[parent_dir[1]] == class_names[label_prediction]:
-    #   prediction_truth = "True" 
-    # else:
-    #   prediction_truth = "False" 
 
     # find the parent directory applying it to the rubric then get the index of the class name
     prediction_truth_index = class_names.index(rubric[parent_dir[0]])
@@ -131,7 +167,9 @@ def test_all_imgs(model, class_names, test_data_path):
   
   return pandas_data 
 
-# Builds the plot with images of random images and one image of a broken wire
+
+
+""" Builds the plot with images of random images and one image of a broken wire """
 def random_test_plot(model, class_names, test_data_path):
     data_paths = []
     for root, dirs, files in os.walk(test_data_path):
@@ -161,6 +199,7 @@ def random_test_plot(model, class_names, test_data_path):
 
     plt.tight_layout()
     plt.show()
+
 
 
 if __name__ == '__main__':
