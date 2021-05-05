@@ -15,6 +15,7 @@ import shutil
 from pathlib import Path
 import subprocess
 from scripts import separate_datasets
+from PIL import ImageOps
 
 def main():
 
@@ -22,10 +23,8 @@ def main():
     subprocess.run("find datasets -type f -name '\.*' -delete", shell=True)
     subprocess.run("find . -name '.DS_Store' -type f -delete", shell=True)
     
-
     # copies original dataset to training dataset
     subprocess.run("cp -r datasets/original/ datasets/training/", shell=True)
-
     root_dir = "datasets/training/" 
 
     separate_datasets.main()
@@ -92,6 +91,7 @@ def augment(images_path):
             key = random.choice(list(transformations)) 
             try: 
                 transformed_image = transformations[key](original_image)
+
             except UnboundLocalError as ue:
                 print(ue)
                 pass
@@ -102,7 +102,7 @@ def augment(images_path):
         # Convert an image to unsigned byte format, with values in [0, 255].
         transformed_image = img_as_ubyte(transformed_image)  
         # convert image to RGB before saving it
-        transformed_image = cv2.cvtColor(transformed_image, cv2.COLOR_BGR2RGB) 
+        # transformed_image = cv2.cvtColor(transformed_image, cv2.COLOR_BGR2RGB) 
         # save transformed image to path
         cv2.imwrite(new_image_path, transformed_image) 
         i = i+1
@@ -136,6 +136,7 @@ def add_noise(image):
 
 def blur_image(image):
     return cv2.GaussianBlur(image, (9,9),0)
+
 
 # classifying blur and non-blur images
 def warp_shift(image): 

@@ -16,10 +16,10 @@ from PIL import Image, ImageOps
 def main():
   subprocess.run("find . -name '.DS_Store' -type f -delete", shell=True)
   model = keras.models.load_model(f"models/{find_most_recent('models')}")
-  print(model)
+  print(find_most_recent('models'))
   # model = keras.models.load_model("tests/converted_keras/keras_model.h5")
   # model = keras.models.load_model("models/saved_flowers_model_mobilenet_v3_small_100_224/")
-  test_data_path = "datasets/augmented_og/"
+  test_data_path = "datasets/testing/"
   model.summary()
   class_names = ['Broken Wire', 'Glue', 'Good', 'No Wires', 'One Third Wire', 'Two Third Wires', 'Unknown Debris']
   # random_test_plot(model, class_names, test_data_path)
@@ -99,6 +99,7 @@ def test_all_imgs(model, class_names, test_data_path):
     normalized_image_array = (image_array.astype(np.float32) / 127.0) - 1
     data[0] = normalized_image_array
     prediction = model.predict(data)
+    print(prediction)
     label_prediction = np.argmax(prediction[0])
     
     print(img_path)
