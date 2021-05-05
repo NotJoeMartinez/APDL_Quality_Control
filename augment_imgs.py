@@ -102,7 +102,7 @@ def augment(images_path):
         # Convert an image to unsigned byte format, with values in [0, 255].
         transformed_image = img_as_ubyte(transformed_image)  
         # convert image to RGB before saving it
-        # transformed_image = cv2.cvtColor(transformed_image, cv2.COLOR_BGR2RGB) 
+        transformed_image = cv2.cvtColor(transformed_image, cv2.COLOR_BGR2RGB) 
         # save transformed image to path
         cv2.imwrite(new_image_path, transformed_image) 
         i = i+1

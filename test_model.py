@@ -18,14 +18,17 @@ def main():
   model = keras.models.load_model(f"models/{find_most_recent('models')}")
   print(find_most_recent('models'))
   # model = keras.models.load_model("tests/converted_keras/keras_model.h5")
-  # model = keras.models.load_model("models/saved_flowers_model_mobilenet_v3_small_100_224/")
+  # model = keras.models.load_model("models/saved_flowers_model_mobilenet_v3_small_100_456/")
   test_data_path = "datasets/testing/"
   model.summary()
   class_names = ['Broken Wire', 'Glue', 'Good', 'No Wires', 'One Third Wire', 'Two Third Wires', 'Unknown Debris']
-  # random_test_plot(model, class_names, test_data_path)
+  random_test_plot(model, class_names, test_data_path)
   tested_images = test_all_imgs(model, class_names, test_data_path) 
   df = pd.DataFrame(tested_images, columns = ['predicted','actual','confidence','path'])
   plot_confusion_matrix(df)  
+
+
+
 
 def plot_confusion_matrix(df):
   import seaborn as sn
@@ -91,8 +94,8 @@ def test_all_imgs(model, class_names, test_data_path):
   
   for count, img_path in enumerate(data_paths):
     temp_data = []
-    size = (480, 480)
-    data = np.ndarray(shape=(1, 480, 480, 3), dtype=np.float32)
+    size = (456, 456)
+    data = np.ndarray(shape=(1, 456, 456, 3), dtype=np.float32)
     image = Image.open(img_path)
     image = ImageOps.fit(image, size, Image.ANTIALIAS)
     image_array = np.asarray(image)
@@ -139,10 +142,10 @@ def random_test_plot(model, class_names, test_data_path):
     num_rows = 3
     num_cols = 3
     num_images = num_rows*num_cols
-    size = (480, 480)
+    size = (456, 456)
     plt.figure(figsize=(2*2*num_cols, 2*num_rows))
     for i, img_path in enumerate(random_test_images):
-        data = np.ndarray(shape=(1, 480, 480, 3), dtype=np.float32)
+        data = np.ndarray(shape=(1, 456, 456, 3), dtype=np.float32)
         image = Image.open(img_path)
         image = ImageOps.fit(image, size, Image.ANTIALIAS)
         image_array = np.asarray(image)

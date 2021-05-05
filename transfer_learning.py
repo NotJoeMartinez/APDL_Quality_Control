@@ -13,7 +13,7 @@ print("TF version:", tf.__version__)
 print("Hub version:", hub.__version__)
 print("GPU is", "available" if tf.test.is_gpu_available() else "NOT AVAILABLE")
 
-model_name = "mobilenet_v3_small_100_224" # @param ['bit_s-r50x1', 'efficientnet_b0', 'efficientnet_b1', 'efficientnet_b2', 'efficientnet_b3', 'efficientnet_b4', 'efficientnet_b5', 'efficientnet_b6', 'efficientnet_b7', 'inception_v3', 'inception_resnet_v2', 'mobilenet_v2_100_224', 'mobilenet_v2_130_224', 'mobilenet_v2_140_224', 'mobilenet_v3_large_100_224', 'mobilenet_v3_large_075_224', 'mobilenet_v3_small_100_224', 'mobilenet_v3_small_075_224', 'nasnet_large', 'nasnet_mobile', 'pnasnet_large', 'resnet_v1_50', 'resnet_v1_101', 'resnet_v1_152', 'resnet_v2_50', 'resnet_v2_101', 'resnet_v2_152']
+model_name = "inception_v3" # @param ['bit_s-r50x1', 'efficientnet_b0', 'efficientnet_b1', 'efficientnet_b2', 'efficientnet_b3', 'efficientnet_b4', 'efficientnet_b5', 'efficientnet_b6', 'efficientnet_b7', 'inception_v3', 'inception_resnet_v2', 'mobilenet_v2_100_224', 'mobilenet_v2_130_224', 'mobilenet_v2_140_224', 'mobilenet_v3_large_100_224', 'mobilenet_v3_large_075_224', 'mobilenet_v3_small_100_224', 'mobilenet_v3_small_075_224', 'nasnet_large', 'nasnet_mobile', 'pnasnet_large', 'resnet_v1_50', 'resnet_v1_101', 'resnet_v1_152', 'resnet_v2_50', 'resnet_v2_101', 'resnet_v2_152']
 # mobilenet_v3_large_100_224
 # model_name = "mobilenet_v3_large_100_224"
 model_handle_map = {
@@ -26,7 +26,8 @@ model_handle_map = {
   "efficientnet_b6": "https://tfhub.dev/tensorflow/efficientnet/b6/feature-vector/1",
   "efficientnet_b7": "https://tfhub.dev/tensorflow/efficientnet/b7/feature-vector/1",
   "bit_s-r50x1": "https://tfhub.dev/google/bit/s-r50x1/1",
-  "inception_v3": "https://tfhub.dev/google/imagenet/inception_v3/feature-vector/4",
+  # "inception_v3": "https://tfhub.dev/google/imagenet/inception_v3/feature-vector/4",
+  "inception_v3": "https://tfhub.dev/google/imagenet/inception_v3/classification/5",
   "inception_resnet_v2": "https://tfhub.dev/google/imagenet/inception_resnet_v2/feature-vector/4",
   "resnet_v1_50": "https://tfhub.dev/google/imagenet/resnet_v1_50/feature-vector/4",
   "resnet_v1_101": "https://tfhub.dev/google/imagenet/resnet_v1_101/feature-vector/4",
@@ -62,7 +63,7 @@ model_image_size_map = {
 }
 
 model_handle = model_handle_map.get(model_name)
-pixels = model_image_size_map.get(model_name, 224)
+pixels = model_image_size_map.get(model_name, 299)
 
 print(f"Selected model: {model_name} : {model_handle}")
 
