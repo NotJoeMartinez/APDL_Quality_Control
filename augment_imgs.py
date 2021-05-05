@@ -16,18 +16,19 @@ from pathlib import Path
 import subprocess
 from scripts import separate_datasets
 from PIL import ImageOps
+# Remove all dotfiles from currend dir 
 
-def main():
+def main(copy_datasets=False, separate_datasets=False, root_dir="datasets/testing", imgs_per_dir=20 ):
 
-    # Remove all dotfiles from currend dir 
     subprocess.run("find datasets -type f -name '\.*' -delete", shell=True)
     subprocess.run("find . -name '.DS_Store' -type f -delete", shell=True)
-    
-    # copies original dataset to training dataset
-    subprocess.run("cp -r datasets/original/ datasets/training/", shell=True)
-    root_dir = "datasets/training/" 
+ 
+    if copy_datasets == True:
+        # copies original dataset to training dataset
+        subprocess.run("cp -r datasets/original/ datasets/training/", shell=True)
 
-    separate_datasets.main()
+    if separate_datasets == True:
+        separate_datasets.main()
 
 
     if not os.path.isdir(root_dir):
@@ -39,12 +40,12 @@ def main():
     for sub_dir in target_dirs: 
         print(sub_dir)
         images_path = f"{root_dir}/{sub_dir}"
-        augment(images_path)
+        augment(images_path, imgs_per_dir=imgs_per_dir)
 
 
 
 
-def augment(images_path):
+def augment(images_path, imgs_per_dir=200):
     # use dictionary to store names of functions 
     transformations = {
                         'horizontal flip': h_flip, 
@@ -68,18 +69,22 @@ def augment(images_path):
     for im in os.listdir(images_path):  
         images.append(os.path.join(images_path,im))
 
-        images_to_generate = 200 - len(images)
+        images_to_generate = imgs_per_dir - len(images)
 
+    # remove this from imgs array because it's a directory not an image
+    images.remove(augmented_path[:-1])
 
     i = 1                        
     while i <= int(images_to_generate):    
         image = random.choice(images)
-        try: 
-            original_image = io.imread(image)
-        except ValueError:
-            pass
+        original_image = io.imread(image)
+        # try: 
+        #     original_image = io.imread(image)
+        # except ValueError:
+        #     pass
 
         transformed_image = None
+ 
 
         # variable to iterate till number of transformation to apply
         n = 0       

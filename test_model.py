@@ -27,7 +27,10 @@ def main(make_notes=True, class_names=class_names, test_data_path=test_data_path
   # for confusion matrix
   tested_images = test_all_imgs(model, class_names, test_data_path) 
   df = pd.DataFrame(tested_images, columns = ['predicted','actual','confidence','path'])
-  plot_confusion_matrix(df,fig_name=f"notes/imgs/{most_recent_model}", show=True)  
+  plot_confusion_matrix(df,fig_name=f"notes/imgs/{most_recent_model}", show=False)  
+
+  # for random sampleing 
+  random_test_plot(model,class_names, test_data_path, model_name=most_recent_model)
 
   if make_notes == True:
     make_md_notes(most_recent_model, model, df)
@@ -40,7 +43,7 @@ def make_md_notes(model_name, model, df):
   from contextlib import redirect_stdout
 
   with open(f"notes/{model_name}.md", 'w') as f:
-    f.write(f"## {model_name} \n")
+    f.write(f"## {model_name} \n\n")
 
     f.write(f"### Model Summary \n")
     f.write("```")
@@ -51,11 +54,16 @@ def make_md_notes(model_name, model, df):
     f.write(f"### Confusion Matrix \n")
     f.write(f"![Confusion Matrix](imgs/{model_name}.png) \n")
 
+    f.write(f"### Random Samples \n")
+
+    f.write(f"![Random Samples](imgs/rand_samples_{model_name}.png) \n")
+
     f.write(f"### Dataframe predictions \n")
     f.write("```")
     with redirect_stdout(f):
       print(df)
     f.write("```")
+
 
 
 
@@ -138,8 +146,8 @@ def test_all_imgs(model, class_names, test_data_path):
   
   for count, img_path in enumerate(data_paths):
     temp_data = []
-    size = (456, 456)
-    data = np.ndarray(shape=(1, 456, 456, 3), dtype=np.float32)
+    size = (224, 224)
+    data = np.ndarray(shape=(1, 224, 224, 3), dtype=np.float32)
     image = Image.open(img_path)
     image = ImageOps.fit(image, size, Image.ANTIALIAS)
     image_array = np.asarray(image)
@@ -170,7 +178,7 @@ def test_all_imgs(model, class_names, test_data_path):
 
 
 """ Builds the plot with images of random images and one image of a broken wire """
-def random_test_plot(model, class_names, test_data_path):
+def random_test_plot(model, class_names, test_data_path, model_name):
     data_paths = []
     for root, dirs, files in os.walk(test_data_path):
         for name in files:
@@ -180,10 +188,10 @@ def random_test_plot(model, class_names, test_data_path):
     num_rows = 3
     num_cols = 3
     num_images = num_rows*num_cols
-    size = (456, 456)
+    size = (224, 224)
     plt.figure(figsize=(2*2*num_cols, 2*num_rows))
     for i, img_path in enumerate(random_test_images):
-        data = np.ndarray(shape=(1, 456, 456, 3), dtype=np.float32)
+        data = np.ndarray(shape=(1, 224, 224, 3), dtype=np.float32)
         image = Image.open(img_path)
         image = ImageOps.fit(image, size, Image.ANTIALIAS)
         image_array = np.asarray(image)
@@ -198,7 +206,8 @@ def random_test_plot(model, class_names, test_data_path):
         _ = plt.xticks(range(7), class_names, rotation=90)
 
     plt.tight_layout()
-    plt.show()
+    plt.savefig(f"notes/imgs/rand_samples_{model_name}")
+    # plt.show()
 
 
 
