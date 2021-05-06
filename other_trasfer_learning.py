@@ -92,7 +92,7 @@ class CollectBatchStats(tf.keras.callbacks.Callback):
 
 batch_stats_callback = CollectBatchStats()
 
-history = model.fit(train_ds, epochs=2,
+history = model.fit(train_ds, epochs=10,
                     callbacks=[batch_stats_callback])
 
 
