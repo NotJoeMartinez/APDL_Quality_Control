@@ -143,7 +143,6 @@ def test_all_imgs(model, class_names, test_data_path):
       data_paths.append(os.path.join(root, name))
 
   # Makes preditctions of every image in the data paths list
-  
   for count, img_path in enumerate(data_paths):
     temp_data = []
     size = (224, 224)
@@ -156,11 +155,8 @@ def test_all_imgs(model, class_names, test_data_path):
     prediction = model.predict(data)
     label_prediction = np.argmax(prediction[0])
     
-    # find test image path parent
     test_file_name = re.findall("\/.*\/(.*\.jpg)", img_path)
-    # print("test file name: ", test_file_name)
     parent_dir = re.findall("\/.*\/(.*)\/.*\/*.jpg", img_path)
-    # print("Parent Dir: ",parent_dir)
 
     # find the parent directory applying it to the rubric then get the index of the class name
     prediction_truth_index = class_names.index(rubric[parent_dir[0]])
