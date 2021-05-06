@@ -22,16 +22,20 @@ def main(make_notes=True, class_names=class_names, test_data_path=test_data_path
   most_recent_model = find_most_recent('models') # finds most recent model
   model = keras.models.load_model(f"models/{most_recent_model}") # loads most recent model
   
-  model.summary()
+  # model.summary()
 
   # for confusion matrix
   tested_images = test_all_imgs(model, class_names, test_data_path) 
-  df = pd.DataFrame(tested_images, columns = ['predicted','actual','confidence','path'])
-  plot_confusion_matrix(df,fig_name=f"notes/imgs/{most_recent_model}", show=False)  
+  df = pd.DataFrame(tested_images, columns = ['score','predicted','actual','confidence','path'])
+  # plot_confusion_matrix(df,fig_name=f"notes/imgs/{most_recent_model}", show=False)  
 
   # for random sampleing 
-  random_test_plot(model,class_names, test_data_path, model_name=most_recent_model)
+  # random_test_plot(model,class_names, test_data_path, model_name=most_recent_model)
 
+  # for calulating results
+
+
+  # for making markdown files
   if make_notes == True:
     make_md_notes(most_recent_model, model, df)
 
@@ -44,6 +48,12 @@ def make_md_notes(model_name, model, df):
 
   with open(f"notes/{model_name}.md", 'w') as f:
     f.write(f"## {model_name} \n\n")
+
+    f.write(f"## Stats \n")
+    with redirect_stdout(f):
+      f.write("```\n")
+      calculate_results(df)
+      f.write("``` \n")
 
     f.write(f"### Model Summary \n")
     f.write("```")
@@ -66,6 +76,23 @@ def make_md_notes(model_name, model, df):
 
 
 
+def calculate_results(df):
+  total_tests = df.shape[0]
+  total_correct = df['score'].value_counts()['True'] 
+  total_incorrect = df['score'].value_counts()['False']
+  percent_correct = (float(total_correct) / float(total_tests)) * 100
+
+
+  # total tests
+  print(f"Total Tests: {total_tests}")
+  # total correct
+  print(f"correct predictions: {total_correct}")
+  # total incorrect 
+  print(f"incorrect predictions: {total_incorrect}")
+  # percentage correct 
+  print(f"Percentage correct: {round(percent_correct, 2)}%")
+
+ 
 
 """ Finds and returns the most recent model in the models directory """ 
 def find_most_recent(directory):
@@ -161,6 +188,12 @@ def test_all_imgs(model, class_names, test_data_path):
     # find the parent directory applying it to the rubric then get the index of the class name
     prediction_truth_index = class_names.index(rubric[parent_dir[0]])
     prediction_truth = class_names[prediction_truth_index]
+
+    if class_names[label_prediction] == prediction_truth:
+      temp_data.append("True")
+    else:
+      temp_data.append("False")
+
     temp_data.append(class_names[label_prediction]) 
     temp_data.append(prediction_truth) 
     # temp_data.append(100 * np.max(prediction[0])) 
