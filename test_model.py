@@ -33,7 +33,7 @@ def main(make_notes=True, class_names=class_names, test_data_path=test_data_path
   # random_test_plot(model,class_names, test_data_path, model_name=most_recent_model)
 
   # for calulating results
-
+  # calculate_results(df, class_names)
 
   # for making markdown files
   if make_notes == True:
@@ -76,14 +76,18 @@ def make_md_notes(model_name, model, df):
 
 
 
-def calculate_results(df):
+def calculate_results(df, class_names=class_names):
   total_tests = df.shape[0]
   total_correct = df['score'].value_counts()['True'] 
   total_incorrect = df['score'].value_counts()['False']
   percent_correct = (float(total_correct) / float(total_tests)) * 100
 
 
-  # total tests
+  # print(df['score']=='True')
+  missed_labels = df[df['score']=='False'] #subset dataFrame
+  # print(type(foo))
+
+  # total tests 
   print(f"Total Tests: {total_tests}")
   # total correct
   print(f"correct predictions: {total_correct}")
@@ -91,8 +95,15 @@ def calculate_results(df):
   print(f"incorrect predictions: {total_incorrect}")
   # percentage correct 
   print(f"Percentage correct: {round(percent_correct, 2)}%")
+  print("=======================")
+  print("Most missed predictions")
+  for class_name in class_names:
+    try:
+      print(f"{class_name}:  {missed_labels['actual'].value_counts()[class_name]}")
+    except KeyError:
+      pass
 
- 
+
 
 """ Finds and returns the most recent model in the models directory """ 
 def find_most_recent(directory):
