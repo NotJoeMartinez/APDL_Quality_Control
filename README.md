@@ -18,10 +18,11 @@ pip install --upgrade tensorflow
 
 
 ### Using the existing dataset
-To use the classified dataset found `datasets/original.tar.gz`  use the linux `tar` command.
+To use the classified dataset found `scripts/original.tar.gz`  use the linux `tar` command.
 ```bash
-cd datasets
-tar -zxvf original.tar.gz
+cp scripts/original.tar.gz  datasets/
+tar -zxvf datasets/original.tar.gz
+rm datasets/original.tar.gz
 ```
 
 ### `augment_imgs.py`
@@ -97,7 +98,4 @@ training directory; Rather it's called by `augment_images.py` before augmenting 
 
 
 
-Example of expected outcome on 9 randomly selected images from our dataset
-
-![fig_one](README.assets/Figure_1.png)
 
