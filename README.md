@@ -36,10 +36,10 @@ This file is what trains our model and saves it to the `models/` directory. It r
 arguments and produces a matplotlib graph showing the training/validation accuracy which can 
 be turned off by removing `show_model_details()` from the last line
 
-### `train_mobilenet.py`
-This file does the same thing as `train_model.py` except it uses a pre-trained mobile net model
-which is what Teachable Machine uses. This method of training has been the most successful but it's 
-a black box as far as how it produces it's results. 
+### `transfer_learning.py` & `other_trasfer_learning.py`
+These files do the same thing as `train_model.py` except it uses a pre-trained model
+This method of training has been the most successful but it's a black box (for me) as 
+to how it produces results. 
 
 ### `test_model.py` 
 This file takes no arguments but has several functions that can be commented in/out depending on what type of tests you want to do.
