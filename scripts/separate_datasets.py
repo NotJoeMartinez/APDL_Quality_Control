@@ -25,13 +25,11 @@ def get_tree_dict(root_path):
     for sub_dir in sub_dirs:
         files = os.listdir(root_path + "/" + sub_dir) 
 
-        # Remove pesky .DS_Store
-        if '.DS_Store' in files: 
-            files.remove('.DS_Store')
-
         tree_dict[sub_dir] = files
     
     return tree_dict
+
+
 
 def parse_tree_dict(tree_dict):
     move_dict = {}
@@ -76,4 +74,3 @@ def mv_train_dirs(root_path, move_dict):
 
 if __name__ == '__main__':
     main()
-    sys.exit(0)

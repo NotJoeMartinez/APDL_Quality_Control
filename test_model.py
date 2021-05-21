@@ -21,9 +21,9 @@ def main(make_notes=True, class_names=class_names, test_data_path=test_data_path
 
   most_recent_model = find_most_recent('models') # finds most recent model
   model = keras.models.load_model(f"models/{most_recent_model}") # loads most recent model
-  
-  # model.summary()
+  model = tf.keras.Sequential([model, tf.keras.layers.Softmax()])
 
+  
   # for confusion matrix
   tested_images = test_all_imgs(model, class_names, test_data_path) 
   df = pd.DataFrame(tested_images, columns = ['score','predicted','actual','confidence','path'])
@@ -180,8 +180,8 @@ def test_all_imgs(model, class_names, test_data_path):
   # Makes preditctions of every image in the data paths list
   for count, img_path in enumerate(data_paths):
     temp_data = []
-    size = (480, 480)
-    data = np.ndarray(shape=(1, 480, 480, 3), dtype=np.float32)
+    size = (224, 224)
+    data = np.ndarray(shape=(1, 224, 224, 3), dtype=np.float32)
     image = Image.open(img_path)
     image = ImageOps.fit(image, size, Image.ANTIALIAS)
     image_array = np.asarray(image)
@@ -225,10 +225,10 @@ def random_test_plot(model, class_names, test_data_path, model_name, show=False)
     num_rows = 3
     num_cols = 3
     num_images = num_rows*num_cols
-    size = (480, 480)
+    size = (224, 224)
     plt.figure(figsize=(2*2*num_cols, 2*num_rows))
     for i, img_path in enumerate(random_test_images):
-        data = np.ndarray(shape=(1, 480, 480, 3), dtype=np.float32)
+        data = np.ndarray(shape=(1, 224, 224, 3), dtype=np.float32)
         image = Image.open(img_path)
         image = ImageOps.fit(image, size, Image.ANTIALIAS)
         image_array = np.asarray(image)

@@ -14,11 +14,11 @@ import glob
 import shutil
 from pathlib import Path
 import subprocess
-from scripts import separate_datasets
+from scripts import separate_datasets as sd
 from PIL import ImageOps
 # Remove all dotfiles from currend dir 
 
-def main(copy_datasets=False, separate_datasets=False, root_dir="datasets/testing", imgs_per_dir=20 ):
+def main(copy_datasets=True, separate_datasets=True, root_dir="datasets/training", imgs_per_dir=200 ):
 
     subprocess.run("find datasets -type f -name '\.*' -delete", shell=True)
     subprocess.run("find . -name '.DS_Store' -type f -delete", shell=True)
@@ -27,8 +27,9 @@ def main(copy_datasets=False, separate_datasets=False, root_dir="datasets/testin
         # copies original dataset to training dataset
         subprocess.run("cp -r datasets/original/ datasets/training/", shell=True)
 
+    # runs dataset separation script
     if separate_datasets == True:
-        separate_datasets.main()
+        sd.main()
 
 
     if not os.path.isdir(root_dir):
@@ -73,10 +74,12 @@ def augment(images_path, imgs_per_dir=200):
 
     # remove this from imgs array because it's a directory not an image
     images.remove(augmented_path[:-1])
+    print(images)
 
     i = 1                        
     while i <= int(images_to_generate):    
         image = random.choice(images)
+        print(image,type(image))
         original_image = io.imread(image)
         # try: 
         #     original_image = io.imread(image)
