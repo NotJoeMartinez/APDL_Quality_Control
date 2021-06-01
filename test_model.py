@@ -19,8 +19,10 @@ class_names = ['Broken Wire', 'Glue', 'Good', 'No Wires', 'One Third Wire', 'Two
 
 def main(make_notes=True, class_names=class_names, test_data_path=test_data_path):
 
-  most_recent_model = find_most_recent('models') # finds most recent model
-  model = keras.models.load_model(f"models/{most_recent_model}") # loads most recent model
+  # most_recent_model = find_most_recent('models') # finds most recent model
+  most_recent_model = "05_26_11:21:58PM"
+  # model = keras.models.load_model(f"models/{most_recent_model}") # loads most recent model
+  model = keras.models.load_model("models/05_26_11:21:58PM") # loads most recent model
 
   
   # for confusion matrix

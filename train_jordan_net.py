@@ -12,17 +12,19 @@ import datetime as dt
 from optparse import OptionParser
 
 parser = OptionParser()
-parser.add_option("--d1", type="float", dest="d1", default=0.3)
+parser.add_option("--d1", type="float", dest="d1", default=0.5)
 parser.add_option("--d2", type="float", dest="d2", default=0.3)
-parser.add_option("--l1_1", type="float", dest="l1_1", default=0.01)
-parser.add_option("--l1_2", type="float", dest="l1_2", default=0.01)
+parser.add_option("--l1_1", type="float", dest="l1_1", default=0.07)
+parser.add_option("--l1_2", type="float", dest="l1_2", default=0.007)
 
 (options, args) = parser.parse_args()
 
 
-data_dir = "datasets/training" 
+#data_dir = "datasets/training" 
+data_dir = "/home/APDLab_QC/datasets/training" 
 data_dir = pathlib.Path(data_dir)
-data_dirV = "datasets/validating" 
+#data_dirV = "datasets/validating" 
+data_dirV = "/home/APDLab_QC/datasets/validating" 
 data_dirV = pathlib.Path(data_dirV)
 
 
@@ -43,6 +45,7 @@ val_ds = tf.keras.preprocessing.image_dataset_from_directory(
 
 class_names = train_ds.class_names
 
+print(f'class_names: {class_names}')
 
 # this should be dynamic to the amout of directories there are in data_dir 
 num_classes =  7 # sum([len(folder) for r, d, folder in os.walk(data_dir)])
@@ -87,11 +90,9 @@ with strategy.scope():
     layers.Flatten(),
 
     layers.Dense(128, activation='relu',use_bias=True, kernel_regularizer =tf.keras.regularizers.l1( l=options.l1_1)),
-#    layers.Dense(128, activation='relu'),
     layers.Dropout(options.d1),
     layers.Dense(32, activation='relu'),
     layers.Dense(32, activation='relu',use_bias=True, kernel_regularizer =tf.keras.regularizers.l1( l=options.l1_2)),
-#    layers.Dropout(options.d2),
     layers.Dense(num_classes,activation="softmax")
   ])
   model.summary()
@@ -102,23 +103,28 @@ with strategy.scope():
               metrics=['accuracy'])
 
 epochs=100
+#epochs=25
 
-# import os
-# save_dir = f'model_checkpoints/d1_{options.d1}_d2_{options.d2}_l1-1_{options.l1_1}_l1-2_{options.l1_2}/'
+import os
+#save_dir = f'model_checkpoints/d1_{options.d1}_d2_{options.d2}_l1-1_{options.l1_1}_l1-2_{options.l1_2}/'
+#model_name = 'CNNv2.e{epoch:03d}.val_acc_{val_accuracy:01.5f}.h5' 
 
-# model_name = 'CNNv2.e{epoch:03d}.val_acc_{val_accuracy:01.5f}.h5' 
-# if not os.path.isdir(save_dir):
-#     os.makedirs(save_dir)
-# filepath = os.path.join(save_dir, model_name)
+save_dir = f'model_checkpoints/JD_CNN_v1/'
+model_name = 'CNNv2.e{epoch:03d}.val_acc_{val_accuracy:01.5f}.h5' 
 
-# checkpoint = ModelCheckpoint(filepath, monitor="val_accuracy",
-#                         verbose=1, save_best_only=True, mode="max")
+if not os.path.isdir(save_dir):
+    os.makedirs(save_dir)
+filepath = os.path.join(save_dir, model_name)
 
-# early = EarlyStopping(monitor="val_loss",
-#                       mode="min", patience=12)
+checkpoint = ModelCheckpoint(filepath, monitor="val_accuracy",
+                        verbose=1, save_best_only=True, mode="max")
 
-# csv_logger = CSVLogger('model_loger.csv', append=True, separator=',')
-# callbacks_list = [checkpoint, early, csv_logger]
+early = EarlyStopping(monitor="val_loss",
+                      mode="min", patience=12)
+
+csv_logger = CSVLogger('model_loger.csv', append=True, separator=',')
+#callbacks_list = [checkpoint, early, csv_logger]
+callbacks_list = [checkpoint, csv_logger]
 
 
 history = model.fit(
@@ -146,18 +152,21 @@ def show_model_details():
   epochs_range = range(epochs)
 
   plt.figure(figsize=(8, 8))
-  plt.subplot(1, 2, 1)
+  #plt.subplot(1, 2, 1)
+  plt.subplot(2, 1, 1)
   plt.plot(epochs_range, acc, label='Training Accuracy')
   plt.plot(epochs_range, val_acc, label='Validation Accuracy')
   plt.legend(loc='lower right')
   plt.title('Training and Validation Accuracy')
 
-  plt.subplot(1, 2, 2)
+  #plt.subplot(1, 2, 2)
+  plt.subplot(2, 1, 2)
   plt.plot(epochs_range, loss, label='Training Loss')
   plt.plot(epochs_range, val_loss, label='Validation Loss')
   plt.legend(loc='upper right')
   plt.title('Training and Validation Loss')
   plt.show()
+  plt.savefig('performance.png')  
 
 
 show_model_details()
