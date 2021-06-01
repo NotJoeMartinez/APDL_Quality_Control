@@ -21,7 +21,6 @@ def main(make_notes=True, class_names=class_names, test_data_path=test_data_path
 
   most_recent_model = find_most_recent('models') # finds most recent model
   model = keras.models.load_model(f"models/{most_recent_model}") # loads most recent model
-  model = tf.keras.Sequential([model, tf.keras.layers.Softmax()])
 
   
   # for confusion matrix
@@ -33,11 +32,12 @@ def main(make_notes=True, class_names=class_names, test_data_path=test_data_path
   random_test_plot(model,class_names, test_data_path, model_name=most_recent_model, show=False)
 
   # for calulating results
-  # calculate_results(df, class_names)
+  calculate_results(df, class_names)
 
   # for making markdown files
   if make_notes == True:
     make_md_notes(most_recent_model, model, df)
+    print("make notes was called")
 
 
 
