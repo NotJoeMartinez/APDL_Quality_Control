@@ -21,10 +21,10 @@ parser.add_option("--l1_2", type="float", dest="l1_2", default=0.007)
 
 
 #data_dir = "datasets/training" 
-data_dir = "/home/APDLab_QC/datasets/training" 
+data_dir = "datasets/training" 
 data_dir = pathlib.Path(data_dir)
 #data_dirV = "datasets/validating" 
-data_dirV = "/home/APDLab_QC/datasets/validating" 
+data_dirV = "datasets/validating" 
 data_dirV = pathlib.Path(data_dirV)
 
 
@@ -33,22 +33,43 @@ img_height = 480
 img_width = 480 
 
 
+# train_ds = tf.keras.preprocessing.image_dataset_from_directory(
+#   data_dir,
+#   image_size=(img_height, img_width),
+#   batch_size=batch_size)
+
+# val_ds = tf.keras.preprocessing.image_dataset_from_directory(
+#   data_dirV,
+#   image_size=(img_height, img_width),
+#   batch_size=batch_size)
+
+
 train_ds = tf.keras.preprocessing.image_dataset_from_directory(
   data_dir,
+  # labels='inferred',
+  validation_split=0.2,
+  subset="training",
+  seed=123,
   image_size=(img_height, img_width),
   batch_size=batch_size)
 
 val_ds = tf.keras.preprocessing.image_dataset_from_directory(
-  data_dirV,
+  data_dir,
+  validation_split=0.2,
+  subset="validation",
+  seed=123,
   image_size=(img_height, img_width),
   batch_size=batch_size)
+
+class_names = train_ds.class_names
+
 
 class_names = train_ds.class_names
 
 print(f'class_names: {class_names}')
 
 # this should be dynamic to the amout of directories there are in data_dir 
-num_classes =  7 # sum([len(folder) for r, d, folder in os.walk(data_dir)])
+num_classes =  7 # sum([len(folder) for r, d, folder in os.walk(mmmmmmmm)])
 print("This data directory has {} subdirectorys".format(num_classes))
 
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau, ModelCheckpoint, CSVLogger
@@ -111,6 +132,7 @@ import os
 
 save_dir = f'model_checkpoints/JD_CNN_v1/'
 model_name = 'CNNv2.e{epoch:03d}.val_acc_{val_accuracy:01.5f}.h5' 
+print(f"MODEL_NAME HERE LINE 114: {model_name}")
 
 if not os.path.isdir(save_dir):
     os.makedirs(save_dir)

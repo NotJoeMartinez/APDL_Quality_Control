@@ -12,39 +12,37 @@ import subprocess
 import pandas as pd 
 import datetime as dt
 from PIL import Image, ImageOps
+from scripts.find_most_recent import find_most_recent
 
 subprocess.run("find . -name '.DS_Store' -type f -delete", shell=True)
 test_data_path = "datasets/testing/"
 class_names = ['Broken Wire', 'Glue', 'Good', 'No Wires', 'One Third Wire', 'Two Third Wires', 'Unknown Debris']
+now = dt.datetime.now().strftime("%m_%d_%I:%M:%S%p")
 
-def main(make_notes=True, class_names=class_names, test_data_path=test_data_path):
+def main(make_notes=True, class_names=class_names, test_data_path=test_data_path, model_name=find_most_recent('models')):
 
-  # most_recent_model = find_most_recent('models') # finds most recent model
-  most_recent_model = "05_26_11:21:58PM"
-  # model = keras.models.load_model(f"models/{most_recent_model}") # loads most recent model
-  model = keras.models.load_model("models/05_26_11:21:58PM") # loads most recent model
+  # loads model
+  model = keras.models.load_model(f"models/{model_name}") 
 
-  
   # for confusion matrix
   tested_images = test_all_imgs(model, class_names, test_data_path) 
   df = pd.DataFrame(tested_images, columns = ['score','predicted','actual','confidence','path'])
-  plot_confusion_matrix(df,fig_name=f"notes/imgs/{most_recent_model}", show=False)  
+  plot_confusion_matrix(df,fig_name=f"notes/imgs/{model_name}", show=False)  
 
   # for random sampleing 
-  random_test_plot(model,class_names, test_data_path, model_name=most_recent_model, show=False)
+  random_test_plot(model, class_names, test_data_path, model_name=model_name, show=False)
 
   # for calulating results
   calculate_results(df, class_names)
 
   # for making markdown files
   if make_notes == True:
-    make_md_notes(most_recent_model, model, df)
-    print("make notes was called")
+    make_md_notes(model, df, model_name)
 
 
 
 """"Makes a markdown summary in notes/{model_name.md}"""
-def make_md_notes(model_name, model, df):
+def make_md_notes(model, df, model_name):
   import markdown
   from contextlib import redirect_stdout
 
@@ -65,12 +63,9 @@ def make_md_notes(model_name, model, df):
 
     f.write(f"### Confusion Matrix \n")
     f.write(f"![Confusion Matrix](imgs/{model_name}.png) \n")
-
     f.write(f"### Random Samples \n")
 
     f.write(f"![Random Samples](imgs/rand_samples_{model_name}.png) \n")
-
-
 
 
 
@@ -80,43 +75,20 @@ def calculate_results(df, class_names=class_names):
   total_correct = df['score'].value_counts()['True'] 
   total_incorrect = df['score'].value_counts()['False']
   percent_correct = (float(total_correct) / float(total_tests)) * 100
-
-
-  # print(df['score']=='True')
   missed_labels = df[df['score']=='False'] #subset dataFrame
-  # print(type(foo))
 
-  # total tests 
   print(f"Total Tests: {total_tests}")
-  # total correct
   print(f"correct predictions: {total_correct}")
-  # total incorrect 
   print(f"incorrect predictions: {total_incorrect}")
-  # percentage correct 
   print(f"Percentage correct: {round(percent_correct, 2)}%")
   print("=======================")
   print("Most missed predictions")
+
   for class_name in class_names:
     try:
       print(f"{class_name}:  {missed_labels['actual'].value_counts()[class_name]}")
     except KeyError:
       pass
-
-
-
-""" Finds and returns the most recent model in the models directory """ 
-def find_most_recent(directory):
-  now = dt.datetime.now()
-  dir_list = os.listdir(directory)
-  datetimes = []
-  for x in dir_list:
-    dir_dt = dt.datetime.strptime(x, '%m_%d_%I:%M:%S%p')
-    datetimes.append(dir_dt)
-
-  most_recent = max(dt for dt in datetimes if dt < now)
-  mr = most_recent.strftime("%m_%d_%-I:%M:%S%p")
-  print(mr)
-  return mr
 
 
 
@@ -182,8 +154,8 @@ def test_all_imgs(model, class_names, test_data_path):
   # Makes preditctions of every image in the data paths list
   for count, img_path in enumerate(data_paths):
     temp_data = []
-    size = (224, 224)
-    data = np.ndarray(shape=(1, 224, 224, 3), dtype=np.float32)
+    size = (480, 480)
+    data = np.ndarray(shape=(1, 480, 480, 3), dtype=np.float32)
     image = Image.open(img_path)
     image = ImageOps.fit(image, size, Image.ANTIALIAS)
     image_array = np.asarray(image)
@@ -227,10 +199,10 @@ def random_test_plot(model, class_names, test_data_path, model_name, show=False)
     num_rows = 3
     num_cols = 3
     num_images = num_rows*num_cols
-    size = (224, 224)
+    size = (480, 480)
     plt.figure(figsize=(2*2*num_cols, 2*num_rows))
     for i, img_path in enumerate(random_test_images):
-        data = np.ndarray(shape=(1, 224, 224, 3), dtype=np.float32)
+        data = np.ndarray(shape=(1, 480, 480, 3), dtype=np.float32)
         image = Image.open(img_path)
         image = ImageOps.fit(image, size, Image.ANTIALIAS)
         image_array = np.asarray(image)

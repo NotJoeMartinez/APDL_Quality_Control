@@ -46,8 +46,7 @@ def main(copy_datasets=True, separate_datasets=True, root_dir="datasets/training
 
 
 
-def augment(images_path, imgs_per_dir=200):
-    # use dictionary to store names of functions 
+def augment(images_path, imgs_per_dir=1000):
     transformations = {
                         'horizontal flip': h_flip, 
                         'vertical flip': v_flip,
