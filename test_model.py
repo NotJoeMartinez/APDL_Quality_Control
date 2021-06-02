@@ -167,7 +167,8 @@ def test_all_imgs(model, class_names, test_data_path, size):
     image = Image.open(img_path)
     image = ImageOps.fit(image, size, Image.ANTIALIAS)
     image_array = np.asarray(image)
-    normalized_image_array = (image_array.astype(np.float32) / 127.0) - 1
+    # normalized_image_array = (image_array.astype(np.float32) / 127.0) - 1
+    normalized_image_array = image_array.astype(np.float32)
     data[0] = normalized_image_array
     prediction = model.predict(data)
     label_prediction = np.argmax(prediction[0])
@@ -215,7 +216,8 @@ def random_test_plot(model, class_names, test_data_path, model_name, size, show=
         image = Image.open(img_path)
         image = ImageOps.fit(image, size, Image.ANTIALIAS)
         image_array = np.asarray(image)
-        normalized_image_array = (image_array.astype(np.float32) / 127.0) - 1
+        # normalized_image_array = (image_array.astype(np.float32) / 127.0) - 1
+        normalized_image_array = image_array.astype(np.float32)
         data[0] = normalized_image_array
         prediction = probability_model.predict(data)
 

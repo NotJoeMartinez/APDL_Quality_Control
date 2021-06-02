@@ -18,7 +18,7 @@ from scripts import separate_datasets as sd
 from PIL import ImageOps
 # Remove all dotfiles from currend dir 
 
-def main(copy_datasets=True, separate_datasets=True, root_dir="datasets/training", imgs_per_dir=200 ):
+def main(copy_datasets=False, separate_datasets=False, root_dir="datasets/testing", imgs_per_dir=50):
 
     subprocess.run("find datasets -type f -name '\.*' -delete", shell=True)
     subprocess.run("find . -name '.DS_Store' -type f -delete", shell=True)
@@ -31,7 +31,6 @@ def main(copy_datasets=True, separate_datasets=True, root_dir="datasets/training
     if separate_datasets == True:
         sd.main()
 
-
     if not os.path.isdir(root_dir):
         print('The path specified does not exist')
         sys.exit()
@@ -41,12 +40,12 @@ def main(copy_datasets=True, separate_datasets=True, root_dir="datasets/training
     for sub_dir in target_dirs: 
         print(sub_dir)
         images_path = f"{root_dir}/{sub_dir}"
-        augment(images_path, imgs_per_dir=imgs_per_dir)
+        augment(images_path, imgs_per_dir)
 
 
 
 
-def augment(images_path, imgs_per_dir=1000):
+def augment(images_path, imgs_per_dir):
     transformations = {
                         'horizontal flip': h_flip, 
                         'vertical flip': v_flip,
@@ -80,10 +79,7 @@ def augment(images_path, imgs_per_dir=1000):
         image = random.choice(images)
         print(image,type(image))
         original_image = io.imread(image)
-        # try: 
-        #     original_image = io.imread(image)
-        # except ValueError:
-        #     pass
+
 
         transformed_image = None
  
@@ -150,8 +146,6 @@ def warp_shift(image):
     transform = AffineTransform(translation=(0,40))  #chose x,y values according to your convinience
     warp_image = warp(image, transform, mode="wrap")
     return warp_image
-
-
 
 
 
