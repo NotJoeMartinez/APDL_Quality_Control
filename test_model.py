@@ -20,7 +20,7 @@ class_names = ['Broken Wire', 'Glue', 'Good', 'No Wires', 'One Third Wire', 'Two
 
 now = dt.datetime.now().strftime("%m_%d_%I:%M:%S%p")
 MOST_RECENT_MODEL = find_most_recent('models')
-CUSTOM_MODEL_NAME = "05_05_7:24:21PM"
+CUSTOM_MODEL_NAME = ""
 
 def main(make_notes=True, class_names=class_names, test_data_path=test_data_path, model_name=MOST_RECENT_MODEL, size=(480,480)):
 
@@ -28,7 +28,6 @@ def main(make_notes=True, class_names=class_names, test_data_path=test_data_path
   try: 
     model_path = sys.argv[1]
     model_name = re.search('[^\/]*$',model_path).group()
-    print(model_name)
     model = keras.models.load_model(f"{model_path}") 
   except IndexError:
     model = keras.models.load_model(f"models/{model_name}") 

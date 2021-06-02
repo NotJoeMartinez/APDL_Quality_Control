@@ -14,6 +14,5 @@ def find_most_recent(directory):
 
   most_recent = max(dt for dt in datetimes if dt < now)
   mr = most_recent.strftime("%m_%d_%-I:%M:%S%p")
-  print(mr)
   return mr
 
