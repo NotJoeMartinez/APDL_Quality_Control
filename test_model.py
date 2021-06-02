@@ -24,13 +24,19 @@ CUSTOM_MODEL_NAME = "05_05_7:24:21PM"
 
 def main(make_notes=True, class_names=class_names, test_data_path=test_data_path, model_name=MOST_RECENT_MODEL, size=(480,480)):
 
-  # loads model
-  model = keras.models.load_model(f"models/{model_name}")
+  # loads model if user supplied path
+  try: 
+    model_path = sys.argv[1]
+    model_name = re.search('[^\/]*$',model_path).group()
+    print(model_name)
+    model = keras.models.load_model(f"{model_path}") 
+  except IndexError:
+    model = keras.models.load_model(f"models/{model_name}") 
 
   # for confusion matrix
   tested_images = test_all_imgs(model, class_names, test_data_path, size) 
   df = pd.DataFrame(tested_images, columns = ['score','predicted','actual','confidence','path'])
-  plot_confusion_matrix(df,fig_name=f"notes/imgs/{model_name}", show=False)  
+  plot_confusion_matrix(df,fig_name=f"notes/imgs/{model_name}.png", show=False)  
 
   # for random sampleing 
   random_test_plot(model, class_names, test_data_path, model_name, size, show=False)
@@ -220,7 +226,8 @@ def random_test_plot(model, class_names, test_data_path, model_name, size, show=
         _ = plt.xticks(range(7), class_names, rotation=90)
 
     plt.tight_layout()
-    plt.savefig(f"notes/imgs/rand_samples_{model_name}")
+
+    plt.savefig(f"notes/imgs/rand_samples_{model_name}.png")
     if show == True:
       plt.show()
 
