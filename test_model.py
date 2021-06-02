@@ -17,20 +17,23 @@ from scripts.find_most_recent import find_most_recent
 subprocess.run("find . -name '.DS_Store' -type f -delete", shell=True)
 test_data_path = "datasets/testing/"
 class_names = ['Broken Wire', 'Glue', 'Good', 'No Wires', 'One Third Wire', 'Two Third Wires', 'Unknown Debris']
-now = dt.datetime.now().strftime("%m_%d_%I:%M:%S%p")
 
-def main(make_notes=True, class_names=class_names, test_data_path=test_data_path, model_name=find_most_recent('models')):
+now = dt.datetime.now().strftime("%m_%d_%I:%M:%S%p")
+MOST_RECENT_MODEL = find_most_recent('models')
+CUSTOM_MODEL_NAME = "05_05_7:24:21PM"
+
+def main(make_notes=True, class_names=class_names, test_data_path=test_data_path, model_name=MOST_RECENT_MODEL, size=(480,480)):
 
   # loads model
-  model = keras.models.load_model(f"models/{model_name}") 
+  model = keras.models.load_model(f"models/{model_name}")
 
   # for confusion matrix
-  tested_images = test_all_imgs(model, class_names, test_data_path) 
+  tested_images = test_all_imgs(model, class_names, test_data_path, size) 
   df = pd.DataFrame(tested_images, columns = ['score','predicted','actual','confidence','path'])
   plot_confusion_matrix(df,fig_name=f"notes/imgs/{model_name}", show=False)  
 
   # for random sampleing 
-  random_test_plot(model, class_names, test_data_path, model_name=model_name, show=False)
+  random_test_plot(model, class_names, test_data_path, model_name, size, show=False)
 
   # for calulating results
   calculate_results(df, class_names)
@@ -133,7 +136,7 @@ def plot_image(predictions_array, class_names, img_array):
   Itterates through all test images, prints predictions, confidence levels 
   and wheather it actually  predicted it correctly it should return a pandas dataframe
   """
-def test_all_imgs(model, class_names, test_data_path):
+def test_all_imgs(model, class_names, test_data_path, size):
 
   rubric = {
   'broken_wire': 'Broken Wire', 
@@ -154,8 +157,7 @@ def test_all_imgs(model, class_names, test_data_path):
   # Makes preditctions of every image in the data paths list
   for count, img_path in enumerate(data_paths):
     temp_data = []
-    size = (480, 480)
-    data = np.ndarray(shape=(1, 480, 480, 3), dtype=np.float32)
+    data = np.ndarray(shape=(1, size[0], size[1], 3), dtype=np.float32)
     image = Image.open(img_path)
     image = ImageOps.fit(image, size, Image.ANTIALIAS)
     image_array = np.asarray(image)
@@ -189,7 +191,8 @@ def test_all_imgs(model, class_names, test_data_path):
 
 
 """ Builds the plot with images of random images and one image of a broken wire """
-def random_test_plot(model, class_names, test_data_path, model_name, show=False):
+def random_test_plot(model, class_names, test_data_path, model_name, size, show=False):
+    probability_model = tf.keras.Sequential([model, tf.keras.layers.Softmax()])
     data_paths = []
     for root, dirs, files in os.walk(test_data_path):
         for name in files:
@@ -199,16 +202,16 @@ def random_test_plot(model, class_names, test_data_path, model_name, show=False)
     num_rows = 3
     num_cols = 3
     num_images = num_rows*num_cols
-    size = (480, 480)
+
     plt.figure(figsize=(2*2*num_cols, 2*num_rows))
     for i, img_path in enumerate(random_test_images):
-        data = np.ndarray(shape=(1, 480, 480, 3), dtype=np.float32)
+        data = np.ndarray(shape=(1, size[0], size[1], 3), dtype=np.float32)
         image = Image.open(img_path)
         image = ImageOps.fit(image, size, Image.ANTIALIAS)
         image_array = np.asarray(image)
         normalized_image_array = (image_array.astype(np.float32) / 127.0) - 1
         data[0] = normalized_image_array
-        prediction = model.predict(data)
+        prediction = probability_model.predict(data)
 
         plt.subplot(num_rows, 2*num_cols, 2*i+1)
         plot_image(prediction[0], class_names, image_array)
