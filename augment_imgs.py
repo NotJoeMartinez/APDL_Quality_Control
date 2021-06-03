@@ -18,7 +18,7 @@ from scripts import separate_datasets as sd
 from PIL import ImageOps
 # Remove all dotfiles from currend dir 
 
-def main(copy_datasets=False, separate_datasets=False, root_dir="datasets/testing", imgs_per_dir=50):
+def main(copy_datasets=False, separate_datasets=False, root_dir="datasets/testing", imgs_per_dir=30):
 
     subprocess.run("find datasets -type f -name '\.*' -delete", shell=True)
     subprocess.run("find . -name '.DS_Store' -type f -delete", shell=True)
@@ -38,7 +38,6 @@ def main(copy_datasets=False, separate_datasets=False, root_dir="datasets/testin
         target_dirs = os.listdir(root_dir) 
     
     for sub_dir in target_dirs: 
-        print(sub_dir)
         images_path = f"{root_dir}/{sub_dir}"
         augment(images_path, imgs_per_dir)
 
@@ -49,8 +48,8 @@ def augment(images_path, imgs_per_dir):
     transformations = {
                         'horizontal flip': h_flip, 
                         'vertical flip': v_flip,
-                    'adding noise': add_noise,
-                    'blurring image': blur_image,
+                    # 'adding noise': add_noise,
+                    # 'blurring image': blur_image,
                     'anticlockwise rotation':anticlockwise_rotation, 
                     'clockwise rotation': clockwise_rotation,
                     
@@ -72,12 +71,10 @@ def augment(images_path, imgs_per_dir):
 
     # remove this from imgs array because it's a directory not an image
     images.remove(augmented_path[:-1])
-    print(images)
 
     i = 1                        
     while i <= int(images_to_generate):    
         image = random.choice(images)
-        print(image,type(image))
         original_image = io.imread(image)
 
 

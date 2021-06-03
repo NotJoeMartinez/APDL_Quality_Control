@@ -1,4 +1,5 @@
 import os, sys, random, pathlib, re
+from os import path
 import PIL
 import numpy as np
 import datetime as dt
@@ -22,7 +23,7 @@ now = dt.datetime.now().strftime("%m_%d_%I:%M:%S%p")
 MOST_RECENT_MODEL = find_most_recent('models')
 CUSTOM_MODEL_NAME = ""
 
-def main(make_notes=True, class_names=class_names, test_data_path=test_data_path, model_name=MOST_RECENT_MODEL, size=(480,480)):
+def main(class_names=class_names, test_data_path=test_data_path, model_name=MOST_RECENT_MODEL, size=(224,224)):
 
   # loads model if user supplied path
   try: 
@@ -31,6 +32,15 @@ def main(make_notes=True, class_names=class_names, test_data_path=test_data_path
     model = keras.models.load_model(f"{model_path}") 
   except IndexError:
     model = keras.models.load_model(f"models/{model_name}") 
+
+  # verify overwriting model report
+  if path.exists(f"notes/{model_name}.md"):
+    overwrite = input("MODEL REPORT EXISTS; Do you want to overwrite? (Y/n): ")
+    if overwrite == "n":
+      print("Exiting")
+      sys.exit() 
+    else:
+      pass
 
   # for confusion matrix
   tested_images = test_all_imgs(model, class_names, test_data_path, size) 
@@ -43,9 +53,7 @@ def main(make_notes=True, class_names=class_names, test_data_path=test_data_path
   # for calulating results
   calculate_results(df, class_names)
 
-  # for making markdown files
-  if make_notes == True:
-    make_md_notes(model, df, model_name)
+  make_md_notes(model, df, model_name)
 
 
 
