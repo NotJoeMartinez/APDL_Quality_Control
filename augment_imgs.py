@@ -43,7 +43,6 @@ def main(copy_datasets=False, separate_datasets=False, root_dir="datasets/testin
 
 
 
-
 def augment(images_path, imgs_per_dir):
     transformations = {
                         'horizontal flip': h_flip, 

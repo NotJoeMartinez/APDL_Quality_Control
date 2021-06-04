@@ -23,7 +23,7 @@ now = dt.datetime.now().strftime("%m_%d_%I:%M:%S%p")
 MOST_RECENT_MODEL = find_most_recent('models')
 CUSTOM_MODEL_NAME = ""
 
-def main(class_names=class_names, test_data_path=test_data_path, model_name=MOST_RECENT_MODEL, size=(224,224)):
+def main(class_names=class_names, test_data_path=test_data_path, model_name=MOST_RECENT_MODEL, size=(480,480)):
 
   # loads model if user supplied path
   try: 
@@ -32,6 +32,8 @@ def main(class_names=class_names, test_data_path=test_data_path, model_name=MOST
     model = keras.models.load_model(f"{model_path}") 
   except IndexError:
     model = keras.models.load_model(f"models/{model_name}") 
+  
+  model.summary()
 
   # verify overwriting model report
   if path.exists(f"notes/{model_name}.md"):
@@ -132,7 +134,7 @@ def plot_value_array(predictions_array, class_names):
   thisplot[predicted_label].set_color('red')
 
 
-
+  
 """ Plots the image in which the model is making predictions on and the percentage certanty """
 def plot_image(predictions_array, class_names, img_array):
   plt.grid(False)
@@ -142,7 +144,6 @@ def plot_image(predictions_array, class_names, img_array):
   predicted_label = np.argmax(predictions_array)
   plt.xlabel("{} {:2.0f}%".format(class_names[predicted_label],
                                 100*np.max(predictions_array)))
-
 
 
   """
