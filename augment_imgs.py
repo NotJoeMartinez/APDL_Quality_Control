@@ -1,90 +1,77 @@
+import os, sys, shutil, subprocess, random, math, glob
+from skimage.transform import rotate 
+from skimage import img_as_ubyte
 import cv2
 import numpy as np
-from skimage import io 
-from skimage.transform import rotate, AffineTransform, warp
-import matplotlib.pyplot as plt
-import random
-from skimage import img_as_ubyte
-import os
-from skimage.util import random_noise
-import argparse
-import sys
-import tempfile
-import glob
-import shutil
-from pathlib import Path
-import subprocess
-from scripts import separate_datasets as sd
-from PIL import ImageOps
-# Remove all dotfiles from currend dir 
+from skimage import io
+from scripts.separate_datasets import get_tree_dict, parse_tree_dict, mv_train_dirs 
 
-def main(copy_datasets=False, separate_datasets=False, root_dir="datasets/testing", imgs_per_dir=30):
+subprocess.run("find . -name '.DS_Store' -type f -delete", shell=True)
 
-    subprocess.run("find datasets -type f -name '\.*' -delete", shell=True)
-    subprocess.run("find . -name '.DS_Store' -type f -delete", shell=True)
- 
-    if copy_datasets == True:
-        # copies original dataset to training dataset
-        subprocess.run("cp -r datasets/original/ datasets/training/", shell=True)
+def main(original_dir=sys.argv[1]):
+    os.makedirs("datasets/testing", exist_ok=True)
+    shutil.copytree(original_dir,"datasets/training")
 
-    # runs dataset separation script
-    if separate_datasets == True:
-        sd.main()
+    do_split("datasets/training")
 
-    if not os.path.isdir(root_dir):
-        print('The path specified does not exist')
-        sys.exit()
-    else:
-        target_dirs = os.listdir(root_dir) 
-    
-    for sub_dir in target_dirs: 
-        images_path = f"{root_dir}/{sub_dir}"
-        augment(images_path, imgs_per_dir)
+    augment_traing_data("datasets/training", 200)
+
+
+def do_split(directory):
+    tree_dict = get_tree_dict(directory) 
+
+    for sub_dir in tree_dict:
+        
+        # finds 30% of the length of images in directory
+        thirty_percent = math.floor((len(tree_dict[sub_dir]) / 100) * 30) 
+
+        move_dict = parse_tree_dict(tree_dict,sub_dir,thirty_percent)
+
+        mv_train_dirs(directory, move_dict)
 
 
 
-def augment(images_path, imgs_per_dir):
+def augment_traing_data(root_dir, imgs_per_dir):
     transformations = {
-                        'horizontal flip': h_flip, 
-                        'vertical flip': v_flip,
-                    # 'adding noise': add_noise,
-                    # 'blurring image': blur_image,
+                        # 'horizontal flip': h_flip, 
+                        # 'vertical flip': v_flip,
                     'anticlockwise rotation':anticlockwise_rotation, 
                     'clockwise rotation': clockwise_rotation,
                     
                     }                
+    for sub_dir in os.listdir(root_dir): 
+        images_path = f"{root_dir}/{sub_dir}"
 
+    # make a temp directory for the augmented images so you're not augmenting 
     augmented_path = f"{images_path}/temp/"
-
     try: 
         os.mkdir(augmented_path)
     except FileExistsError:
         pass
 
-    images=[]  
     # read image name from folder and append its path into "images" array     
+    images=[]  
     for im in os.listdir(images_path):  
         images.append(os.path.join(images_path,im))
-
-        images_to_generate = imgs_per_dir - len(images)
+    
+    images_to_generate = imgs_per_dir - len(images)
 
     # remove this from imgs array because it's a directory not an image
     images.remove(augmented_path[:-1])
 
-    i = 1                        
+    i = 1 
     while i <= int(images_to_generate):    
         image = random.choice(images)
         original_image = io.imread(image)
 
-
         transformed_image = None
  
 
-        # variable to iterate till number of transformation to apply
-        n = 0       
         # choose random number of transformation to apply on the image
         transformation_count = random.randint(1, len(transformations)) 
 
+        # variable to iterate till number of transformation to apply
+        n = 0       
         # randomly choosing method to call
         while n <= transformation_count:
             key = random.choice(list(transformations)) 
@@ -116,13 +103,15 @@ def augment(images_path, imgs_per_dir):
 
 
 
+
+
 def anticlockwise_rotation(image):
     angle = random.randint(0,180)
-    return rotate(image, angle)
+    return rotate(image, angle, resize=False,  cval=1, mode='edge')
 
 def clockwise_rotation(image):
     angle = random.randint(0,180)
-    return rotate(image, -angle)
+    return rotate(image, -angle, resize=False, cval=1,  mode='edge')
 
 def h_flip(image):
     return  np.fliplr(image)
@@ -130,21 +119,6 @@ def h_flip(image):
 def v_flip(image):
     return np.flipud(image)
 
-def add_noise(image):
-    return random_noise(image)
-
-def blur_image(image):
-    return cv2.GaussianBlur(image, (9,9),0)
-
-
-# classifying blur and non-blur images
-def warp_shift(image): 
-    transform = AffineTransform(translation=(0,40))  #chose x,y values according to your convinience
-    warp_image = warp(image, transform, mode="wrap")
-    return warp_image
-
-
 
 if __name__ == '__main__':
     main()
-    sys.exit(0)
