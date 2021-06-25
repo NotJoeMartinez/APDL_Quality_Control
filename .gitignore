@@ -15,6 +15,8 @@ datasets/testing/**/*.jpg
 datasets/testing/**/*.png
 datasets/training/**/*.png
 datasets/training/**/*.jpg
+data_cleaning/data/
+data_cleaning/data
 
 
 # Don't push the models. 

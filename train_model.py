@@ -5,7 +5,7 @@ import PIL
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
-from tensorflow.keras.models import Sequential
+from tensorflow.keras.models import Sequential 
 import pathlib
 import datetime as dt
 
@@ -22,33 +22,34 @@ parser.add_option("--l1_2", type="float", dest="l1_2", default=0.007)
 
 data_dir = "datasets/training" 
 data_dir = pathlib.Path(data_dir)
-data_dirV = "datasets/validating" 
-data_dirV = pathlib.Path(data_dirV)
-
 
 batch_size = 128
 img_height = 480 
 img_width = 480 
 
-
 train_ds = tf.keras.preprocessing.image_dataset_from_directory(
   data_dir,
+  validation_split=0.2,
+  subset="training",
+  seed=123,
   image_size=(img_height, img_width),
   batch_size=batch_size)
 
 val_ds = tf.keras.preprocessing.image_dataset_from_directory(
-  data_dirV,
+  data_dir,
+  validation_split=0.2,
+  subset="validation",
+  seed=123,
   image_size=(img_height, img_width),
   batch_size=batch_size)
 
-class_names = train_ds.class_names
 class_names = train_ds.class_names
 
 
 print(f'class_names: {class_names}')
 
 # this should be dynamic to the amout of directories there are in data_dir 
-num_classes =  7 # sum([len(folder) for r, d, folder in os.walk(mmmmmmmm)])
+num_classes =  2 
 print("This data directory has {} subdirectorys".format(num_classes))
 
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau, ModelCheckpoint, CSVLogger
@@ -70,7 +71,7 @@ with strategy.scope():
     layers.MaxPooling2D(),
     layers.Conv2D(32, 3, padding='same', activation='relu'),
     layers.Conv2D(32, 3, padding='same', activation='relu'),
-    layers.Batchation(),
+    layers.BatchNormalization(),
     layers.MaxPooling2D(),
     layers.Conv2D(32, 3, padding='same', activation='relu'),
     layers.Conv2D(32, 3, padding='same', activation='relu'),
