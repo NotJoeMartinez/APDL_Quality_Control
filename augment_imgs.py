@@ -9,12 +9,13 @@ from scripts.separate_datasets import get_tree_dict, parse_tree_dict, mv_train_d
 subprocess.run("find . -name '.DS_Store' -type f -delete", shell=True)
 
 def main(original_dir=sys.argv[1]):
-    os.makedirs("datasets/testing", exist_ok=True)
-    shutil.copytree(original_dir,"datasets/training")
+    testing_dir =  "datasets/testing"
+    training_dir =  "datasets/training"
 
-    do_split("datasets/training")
-
-    # augment_traing_data("datasets/training")
+    os.makedirs(testing_dir, exist_ok=True)
+    shutil.copytree(original_dir,training_dir)
+    do_split(training_dir)
+    augment_traing_data(training_dir, 500)
 
 # split 30% of dataset?
 def do_split(directory):
@@ -33,8 +34,8 @@ def do_split(directory):
 
 def augment_traing_data(root_dir, imgs_per_dir):
     transformations = {
-                        # 'horizontal flip': h_flip, 
-                        # 'vertical flip': v_flip,
+                    'horizontal flip': h_flip, 
+                    'vertical flip': v_flip,
                     'anticlockwise rotation':anticlockwise_rotation, 
                     'clockwise rotation': clockwise_rotation,
                     
@@ -42,65 +43,61 @@ def augment_traing_data(root_dir, imgs_per_dir):
     for sub_dir in os.listdir(root_dir): 
         images_path = f"{root_dir}/{sub_dir}"
 
-    # make a temp directory for the augmented images so you're not augmenting 
-    augmented_path = f"{images_path}/temp/"
-    try: 
-        os.mkdir(augmented_path)
-    except FileExistsError:
-        pass
+        # make a temp directory for the augmented images so you're not augmenting 
+        augmented_path = f"{images_path}/temp/"
+        try: 
+            os.mkdir(augmented_path)
+        except FileExistsError:
+            pass
 
-    # read image name from folder and append its path into "images" array     
-    images=[]  
-    for im in os.listdir(images_path):  
-        images.append(os.path.join(images_path,im))
-    
-    images_to_generate = imgs_per_dir - len(images)
+        # read image name from folder and append its path into "images" array     
+        images=[]  
+        for im in os.listdir(images_path):  
+            images.append(os.path.join(images_path,im))
+        
+        images_to_generate = imgs_per_dir - len(images)
 
-    # remove this from imgs array because it's a directory not an image
-    images.remove(augmented_path[:-1])
+        # remove this from imgs array because it's a directory not an image
+        images.remove(augmented_path[:-1])
 
-    i = 1 
-    while i <= int(images_to_generate):    
-        image = random.choice(images)
-        original_image = io.imread(image)
+        i = 1 
+        while i <= int(images_to_generate):    
+            image = random.choice(images)
+            original_image = io.imread(image)
+            transformed_image = None
+            # choose random number of transformation to apply on the image
+            transformation_count = random.randint(1, len(transformations)) 
 
-        transformed_image = None
- 
+            # variable to iterate till number of transformation to apply
+            n = 0       
+            # randomly choosing method to call
+            while n <= transformation_count:
+                key = random.choice(list(transformations)) 
+                try: 
+                    transformed_image = transformations[key](original_image)
 
-        # choose random number of transformation to apply on the image
-        transformation_count = random.randint(1, len(transformations)) 
+                except UnboundLocalError as ue:
+                    print(ue)
+                    pass
+                n = n + 1
+                
+            new_image_path = "{}augmented_image_{}.jpg".format(augmented_path, i)
+            print(new_image_path)
+            # Convert an image to unsigned byte format, with values in [0, 255].
+            transformed_image = img_as_ubyte(transformed_image)  
+            # convert image to RGB before saving it
+            transformed_image = cv2.cvtColor(transformed_image, cv2.COLOR_BGR2RGB) 
+            # save transformed image to path
+            cv2.imwrite(new_image_path, transformed_image) 
+            i = i+1
 
-        # variable to iterate till number of transformation to apply
-        n = 0       
-        # randomly choosing method to call
-        while n <= transformation_count:
-            key = random.choice(list(transformations)) 
-            try: 
-                transformed_image = transformations[key](original_image)
+        for aug_file in glob.glob(f"{augmented_path}*.jpg"):
+            shutil.move(aug_file,images_path)
 
-            except UnboundLocalError as ue:
-                print(ue)
-                pass
-
-            n = n + 1
-            
-        new_image_path = "{}augmented_image_{}.jpg".format(augmented_path, i)
-        # Convert an image to unsigned byte format, with values in [0, 255].
-        transformed_image = img_as_ubyte(transformed_image)  
-        # convert image to RGB before saving it
-        transformed_image = cv2.cvtColor(transformed_image, cv2.COLOR_BGR2RGB) 
-        # save transformed image to path
-        cv2.imwrite(new_image_path, transformed_image) 
-        i = i+1
-
-    for aug_file in glob.glob(f"{augmented_path}*.jpg"):
-        shutil.move(aug_file,images_path)
-
-    try:
-        os.rmdir(augmented_path)
-    except OSError as e:
-        print(f'Error: {augmented_path} : {e.strerror}')
-
+        try:
+            os.rmdir(augmented_path)
+        except OSError as e:
+            print(f'Error: {augmented_path} : {e.strerror}')
 
 
 
