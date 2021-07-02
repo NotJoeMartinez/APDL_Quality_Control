@@ -23,7 +23,7 @@ now = dt.datetime.now().strftime("%m_%d_%I:%M:%S%p")
 MOST_RECENT_MODEL = find_most_recent('models/default')
 CUSTOM_MODEL_NAME = ""
 
-def main(class_names=class_names, test_data_path=test_data_path, model_name=MOST_RECENT_MODEL, size=(480,480)):
+def main(class_names=class_names, test_data_path=test_data_path, model_name=MOST_RECENT_MODEL, size=(224,224)):
 
     # loads model if user supplied path
     try: 
@@ -47,11 +47,12 @@ def main(class_names=class_names, test_data_path=test_data_path, model_name=MOST
     # for confusion matrix
     tested_images = test_all_imgs(model, class_names, test_data_path, size) 
     df = pd.DataFrame(tested_images, columns = ['score','predicted','actual','confidence','path'])
-    df.to_csv(f'{model_name}.csv', encoding='utf-8')
+    df.to_csv(f'notes/csvs/{model_name}.csv', encoding='utf-8')
+    
     plot_confusion_matrix(df,fig_name=f"notes/imgs/{model_name}.png", show=False)  
 
     # for random sampleing 
-    # random_test_plot(model, class_names, test_data_path, model_name, size, show=False)
+    random_test_plot(model, class_names, test_data_path, model_name, size, show=False)
 
     # for calulating results
     calculate_results(df, class_names)
@@ -216,8 +217,8 @@ def random_test_plot(model, class_names, test_data_path, model_name, size, show=
         image = Image.open(img_path)
         image = ImageOps.fit(image, size, Image.ANTIALIAS)
         image_array = np.asarray(image)
-        # normalized_image_array = (image_array.astype(np.float32) / 127.0) - 1
-        normalized_image_array = image_array.astype(np.float32)
+        normalized_image_array = (image_array.astype(np.float32) / 127.0) - 1
+        # normalized_image_array = image_array.astype(np.float32)
         data[0] = normalized_image_array
         prediction = probability_model.predict(data)
 

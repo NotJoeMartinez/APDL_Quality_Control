@@ -15,7 +15,7 @@ print("TF version:", tf.__version__)
 print("Hub version:", hub.__version__)
 print("GPU is", "available" if tf.test.is_gpu_available() else "NOT AVAILABLE")
 
-model_name = "inception_v3" # @param ['bit_s-r50x1', 'efficientnet_b0', 'efficientnet_b1', 'efficientnet_b2', 'efficientnet_b3', 'efficientnet_b4', 'efficientnet_b5', 'efficientnet_b6', 'efficientnet_b7', 'inception_v3', 'inception_resnet_v2', 'mobilenet_v2_100_224', 'mobilenet_v2_130_224', 'mobilenet_v2_140_224', 'mobilenet_v3_large_100_224', 'mobilenet_v3_large_075_224', 'mobilenet_v3_small_100_224', 'mobilenet_v3_small_075_224', 'nasnet_large', 'nasnet_mobile', 'pnasnet_large', 'resnet_v1_50', 'resnet_v1_101', 'resnet_v1_152', 'resnet_v2_50', 'resnet_v2_101', 'resnet_v2_152']
+model_name = "mobilenet_v3_small_100_224" # @param ['bit_s-r50x1', 'efficientnet_b0', 'efficientnet_b1', 'efficientnet_b2', 'efficientnet_b3', 'efficientnet_b4', 'efficientnet_b5', 'efficientnet_b6', 'efficientnet_b7', 'inception_v3', 'inception_resnet_v2', 'mobilenet_v2_100_224', 'mobilenet_v2_130_224', 'mobilenet_v2_140_224', 'mobilenet_v3_large_100_224', 'mobilenet_v3_large_075_224', 'mobilenet_v3_small_100_224', 'mobilenet_v3_small_075_224', 'nasnet_large', 'nasnet_mobile', 'pnasnet_large', 'resnet_v1_50', 'resnet_v1_101', 'resnet_v1_152', 'resnet_v2_50', 'resnet_v2_101', 'resnet_v2_152']
 
 model_handle_map = {
 	"efficientnet_b0": "https://tfhub.dev/tensorflow/efficientnet/b0/feature-vector/1",
@@ -64,7 +64,7 @@ model_image_size_map = {
 }
 
 model_handle = model_handle_map.get(model_name)
-pixels = model_image_size_map.get(model_name, 299)
+pixels = model_image_size_map.get(model_name, 224)
 
 print(f"Selected model: {model_name} : {model_handle}")
 
@@ -163,7 +163,7 @@ print("Predicted label: " + get_class_string_from_index(predicted_index))
 
 
 now = dt.datetime.now()
-model_dir="models/{}/".format(now.strftime("%m_%d_%-I:%M:%S%p"))
+model_dir="models/custom/{}/".format(now.strftime("%m_%d_%-I:%M:%S%p"))
 model.save(model_dir)
 
 print("Model for {} training set saved in {}".format(data_dir,model_dir))
