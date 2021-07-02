@@ -19,11 +19,11 @@ subprocess.run("find . -name '.DS_Store' -type f -delete", shell=True)
 test_data_path = "datasets/testing/"
 class_names = ["AllWires", "BrokenWires", "FooBar", "Glue", "NoWires", "OneThirdsWires", "TwoThirdsWires"]
 
-now = dt.datetime.now().strftime("%m_%d_%I:%M:%S%p")
+now = dt.datetime.now().strftime("%m_%d_%I%M%S%p")
 MOST_RECENT_MODEL = find_most_recent('models/default')
 CUSTOM_MODEL_NAME = ""
 
-def main(class_names=class_names, test_data_path=test_data_path, model_name=MOST_RECENT_MODEL, size=(224,224)):
+def main(class_names=class_names, test_data_path=test_data_path, model_name=MOST_RECENT_MODEL, size=(480,480)):
 
     # loads model if user supplied path
     try: 
@@ -56,7 +56,6 @@ def main(class_names=class_names, test_data_path=test_data_path, model_name=MOST
 
     # for calulating results
     calculate_results(df, class_names)
-
     make_md_notes(model, df, model_name)
 
 
@@ -75,17 +74,18 @@ def make_md_notes(model, df, model_name):
         calculate_results(df)
         f.write("``` \n")
 
+      f.write(f"### Confusion Matrix \n")
+      f.write(f"![Confusion Matrix](imgs/{model_name}.png) \n")
+      f.write(f"### Random Samples \n")
+
+      f.write(f"![Random Samples](imgs/rand_samples_{model_name}.png) \n")
+
       f.write(f"### Model Summary \n")
       f.write("```")
       with redirect_stdout(f):
           model.summary()
       f.write("``` \n") 
 
-      f.write(f"### Confusion Matrix \n")
-      f.write(f"![Confusion Matrix](imgs/{model_name}.png) \n")
-      f.write(f"### Random Samples \n")
-
-      f.write(f"![Random Samples](imgs/rand_samples_{model_name}.png) \n")
 
 
 
@@ -168,8 +168,8 @@ def test_all_imgs(model, class_names, test_data_path, size):
       image = Image.open(img_path)
       image = ImageOps.fit(image, size, Image.ANTIALIAS)
       image_array = np.asarray(image)
-      normalized_image_array = (image_array.astype(np.float32) / 127.0) - 1
-      # normalized_image_array = image_array.astype(np.float32)
+      # normalized_image_array = (image_array.astype(np.float32) / 127.0) - 1
+      normalized_image_array = image_array.astype(np.float32)
       data[0] = normalized_image_array
       prediction = model.predict(data)
       label_prediction = np.argmax(prediction[0])
@@ -217,8 +217,8 @@ def random_test_plot(model, class_names, test_data_path, model_name, size, show=
         image = Image.open(img_path)
         image = ImageOps.fit(image, size, Image.ANTIALIAS)
         image_array = np.asarray(image)
-        normalized_image_array = (image_array.astype(np.float32) / 127.0) - 1
-        # normalized_image_array = image_array.astype(np.float32)
+        # normalized_image_array = (image_array.astype(np.float32) / 127.0) - 1
+        normalized_image_array = image_array.astype(np.float32)
         data[0] = normalized_image_array
         prediction = probability_model.predict(data)
 

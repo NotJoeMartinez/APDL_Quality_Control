@@ -12,10 +12,10 @@ def main(original_dir=sys.argv[1]):
     testing_dir =  "datasets/testing"
     training_dir =  "datasets/training"
 
-    os.makedirs(testing_dir, exist_ok=True)
-    shutil.copytree(original_dir,training_dir)
-    do_split(training_dir)
-    augment_traing_data(training_dir, 500)
+    # os.makedirs(testing_dir, exist_ok=True)
+    # shutil.copytree(original_dir,training_dir)
+    # do_split(training_dir)
+    augment_traing_data(testing_dir, 170)
 
 # split 30% of dataset?
 def do_split(directory):

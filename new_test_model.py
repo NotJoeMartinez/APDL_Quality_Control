@@ -22,7 +22,7 @@ class_names = ["AllWires", "BrokenWires", "FooBar", "Glue", "NoWires", "OneThird
 now = dt.datetime.now().strftime("%m_%d_%I:%M:%S%p")
 
 
-def main(class_names=class_names, test_data_path=test_data_path, size=(299,299)):
+def main(class_names=class_names, test_data_path=test_data_path, size=(480,480)):
 	model_path = sys.argv[1]
 	model = keras.models.load_model(f"{model_path}") 
 	tested_images = test_all_imgs(model, class_names, test_data_path, size) 

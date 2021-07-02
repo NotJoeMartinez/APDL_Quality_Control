@@ -29,6 +29,7 @@ img_width = 480
 
 train_ds = tf.keras.preprocessing.image_dataset_from_directory(
   data_dir,
+  labels='inferred',
   validation_split=0.2,
   subset="training",
   seed=123,
@@ -37,6 +38,7 @@ train_ds = tf.keras.preprocessing.image_dataset_from_directory(
 
 val_ds = tf.keras.preprocessing.image_dataset_from_directory(
   data_dir,
+  labels='inferred',
   validation_split=0.2,
   subset="validation",
   seed=123,
@@ -60,7 +62,7 @@ strategy = tf.distribute.MirroredStrategy(devices=["/gpu:2","/gpu:3"],
 with strategy.scope():
 
   model = Sequential([
-    
+   # rescales the input tensor to height, width and depth of input image
     layers.experimental.preprocessing.Rescaling(1./255, input_shape=(img_height, img_width, 3)),
 
     layers.Conv2D(16, 3, padding='same', activation='relu'),
