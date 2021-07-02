@@ -14,9 +14,9 @@ def main(original_dir=sys.argv[1]):
 
     do_split("datasets/training")
 
-    augment_traing_data("datasets/training", 200)
+    # augment_traing_data("datasets/training")
 
-
+# split 30% of dataset?
 def do_split(directory):
     tree_dict = get_tree_dict(directory) 
 

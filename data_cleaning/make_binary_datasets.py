@@ -31,21 +31,31 @@ def make_sorted_directories(label_dir_dict):
 
 def copy_dataset(label_dict, only_files, label_dir_dict):
 
-    for target_dir in label_dir_dict:
-
-        for image_name in only_files:
-            print(only_files, label_dict)
+    for image_name in only_files:
+        try:
             image_path = f"data/original_imgs/{image_name}"
-            print(target_dir, label_dict[image_name])
-            try: 
+            label_path = f"data/sorted_data/{label_dict[image_name][0]}"  
+            shutil.copy(image_path, label_path)
+        except KeyError:
+                no_label_path = "data/sorted_data/no_label" 
+                pathlib.Path(no_label_path).mkdir(parents=True, exist_ok=True) 
+                shutil.copy(image_path, no_label_path)
 
-                if target_dir == label_dict[image_name]:
-                    shutil.copy(image_path, f'data/sorted_data/{target_dir}')
-                else:
-                    shutil.copy(image_path, f'data/sorted_data/{target_dir}')
-            except KeyError:
-                    shutil.copy(image_path,'data/sorted_data/')
-                    pass
+
+
+    # for target_dir in label_dir_dict:
+
+
+
+            # try: 
+
+            #     if target_dir == "FooBar":
+            #         shutil.copy(image_path, f'data/sorted_data/{target_dir}')
+            #     else:
+            #         shutil.copy(image_path, f'data/sorted_data/{target_dir}')
+            # except KeyError:
+            #         shutil.copy(image_path,'data/sorted_data/')
+            #         pass
 
 
 def make_label_dict(only_files, json_path):

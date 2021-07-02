@@ -49,7 +49,7 @@ class_names = train_ds.class_names
 print(f'class_names: {class_names}')
 
 # this should be dynamic to the amout of directories there are in data_dir 
-num_classes =  2 
+num_classes =  7 
 print("This data directory has {} subdirectorys".format(num_classes))
 
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau, ModelCheckpoint, CSVLogger
