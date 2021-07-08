@@ -11,6 +11,7 @@ subprocess.run("find . -name '.DS_Store' -type f -delete", shell=True)
 def main(original_dir=sys.argv[1]):
     testing_dir =  "datasets/testing"
     training_dir =  "datasets/training"
+ 
 
     # os.makedirs(testing_dir, exist_ok=True)
     # shutil.copytree(original_dir,training_dir)

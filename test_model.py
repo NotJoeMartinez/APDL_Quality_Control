@@ -1,42 +1,28 @@
-import os, sys, random, pathlib, re
-from os import path
-import PIL
+import os, sys, random, re, subprocess
 import numpy as np
-import datetime as dt
 import tensorflow as tf
-from tensorflow import keras
-from tensorflow.keras import layers
-from tensorflow.keras.models import Sequential
 import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
-import subprocess
 import pandas as pd 
-import datetime as dt
+from os import path
 from PIL import Image, ImageOps
-from scripts.find_most_recent import find_most_recent
+from tensorflow import keras
 
 subprocess.run("find . -name '.DS_Store' -type f -delete", shell=True)
 test_data_path = "datasets/testing/"
 class_names = ["AllWires", "BrokenWires", "FooBar", "Glue", "NoWires", "OneThirdsWires", "TwoThirdsWires"]
 
-now = dt.datetime.now().strftime("%m_%d_%I%M%S%p")
-MOST_RECENT_MODEL = find_most_recent('models/default')
-CUSTOM_MODEL_NAME = ""
-
-def main(class_names=class_names, test_data_path=test_data_path, model_name=MOST_RECENT_MODEL, size=(480,480)):
-
+def main(class_names=class_names, test_data_path=test_data_path, report_name=sys.argv[2], size=(480,480)):
     # loads model if user supplied path
     try: 
       model_path = sys.argv[1]
-      model_name = re.search('[^\/]*$',model_path).group()
       model = keras.models.load_model(f"{model_path}") 
     except IndexError:
-      model = keras.models.load_model(f"models/{model_name}") 
+      print("You need to specifiy a model")
     
     model.summary()
 
     # verify overwriting model report
-    if path.exists(f"notes/{model_name}.md"):
+    if path.exists(f"notes/{report_name}.md"):
       overwrite = input("MODEL REPORT EXISTS; Do you want to overwrite? (Y/n): ")
       if overwrite == "n":
         print("Exiting")
@@ -47,38 +33,38 @@ def main(class_names=class_names, test_data_path=test_data_path, model_name=MOST
     # for confusion matrix
     tested_images = test_all_imgs(model, class_names, test_data_path, size) 
     df = pd.DataFrame(tested_images, columns = ['score','predicted','actual','confidence','path'])
-    df.to_csv(f'notes/csvs/{model_name}.csv', encoding='utf-8')
-    
-    plot_confusion_matrix(df,fig_name=f"notes/imgs/{model_name}.png", show=False)  
+    df.to_csv(f'notes/csvs/{report_name}.csv', encoding='utf-8')
+    plot_confusion_matrix(df,fig_name=f"notes/imgs/{report_name}.png", show=False)  
 
     # for random sampleing 
-    random_test_plot(model, class_names, test_data_path, model_name, size, show=False)
+    random_test_plot(model, class_names, test_data_path, report_name, size, show=False)
 
     # for calulating results
     calculate_results(df, class_names)
-    make_md_notes(model, df, model_name)
+
+    # Makes markdown report using the plots and stuff
+    make_md_notes(model, df, report_name)
 
 
 
-""""Makes a markdown summary in notes/{model_name.md}"""
-def make_md_notes(model, df, model_name):
+""""Makes a markdown summary in notes/{report_name.md}"""
+def make_md_notes(model, df, report_name):
     import markdown
     from contextlib import redirect_stdout
 
-    with open(f"notes/{model_name}.md", 'w') as f:
-      f.write(f"## {model_name} \n\n")
+    with open(f"notes/{report_name}.md", 'w') as f:
+      f.write(f"## {report_name} \n\n")
 
       f.write(f"## Stats \n")
       with redirect_stdout(f):
         f.write("```\n")
         calculate_results(df)
         f.write("``` \n")
-
       f.write(f"### Confusion Matrix \n")
-      f.write(f"![Confusion Matrix](imgs/{model_name}.png) \n")
+      f.write(f"![Confusion Matrix](imgs/{report_name}.png) \n")
       f.write(f"### Random Samples \n")
 
-      f.write(f"![Random Samples](imgs/rand_samples_{model_name}.png) \n")
+      f.write(f"![Random Samples](imgs/rand_samples_{report_name}.png) \n")
 
       f.write(f"### Model Summary \n")
       f.write("```")
@@ -163,6 +149,8 @@ def test_all_imgs(model, class_names, test_data_path, size):
 
     # Makes preditctions of every image in the data paths list
     for count, img_path in enumerate(data_paths):
+      print(f"{count}/{len(data_paths)}")
+      # make_activation_map(model,img_path, class_names) # Makes activation maps
       temp_data = []
       data = np.ndarray(shape=(1, size[0], size[1], 3), dtype=np.float32)
       image = Image.open(img_path)
@@ -199,7 +187,7 @@ def test_all_imgs(model, class_names, test_data_path, size):
 
 
 """ Builds the plot with images of random images and one image of a broken wire """
-def random_test_plot(model, class_names, test_data_path, model_name, size, show=False):
+def random_test_plot(model, class_names, test_data_path, report_name, size, show=False):
     probability_model = tf.keras.Sequential([model, tf.keras.layers.Softmax()])
     data_paths = []
     for root, dirs, files in os.walk(test_data_path):
@@ -230,7 +218,7 @@ def random_test_plot(model, class_names, test_data_path, model_name, size, show=
 
     plt.tight_layout()
 
-    plt.savefig(f"notes/imgs/rand_samples_{model_name}.png")
+    plt.savefig(f"notes/imgs/rand_samples_{report_name}.png")
     if show == True:
       plt.show()
 

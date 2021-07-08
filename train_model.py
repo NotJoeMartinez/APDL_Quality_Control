@@ -49,6 +49,8 @@ class_names = train_ds.class_names
 
 
 print(f'class_names: {class_names}')
+foo = layers.experimental.preprocessing.Rescaling(1./255, input_shape=(img_height, img_width, 3))
+print(foo, type(foo))
 
 # this should be dynamic to the amout of directories there are in data_dir 
 num_classes =  7 
@@ -89,13 +91,11 @@ with strategy.scope():
     layers.MaxPooling2D(),
     layers.Conv2D(64, 3, padding='same', activation='relu'),
     layers.MaxPooling2D(pool_size=(3, 3)),
-
     layers.Flatten(),
-
-    layers.Dense(128, activation='relu',use_bias=True, kernel_regularizer =tf.keras.regularizers.l1( l=options.l1_1)),
+    layers.Dense(128, activation='relu',use_bias=True, kernel_regularizer=tf.keras.regularizers.l1( l=options.l1_1)),
     layers.Dropout(options.d1),
     layers.Dense(32, activation='relu'),
-    layers.Dense(32, activation='relu',use_bias=True, kernel_regularizer =tf.keras.regularizers.l1( l=options.l1_2)),
+    layers.Dense(32, activation='relu',use_bias=True, kernel_regularizer=tf.keras.regularizers.l1( l=options.l1_2)),
     layers.Dense(num_classes,activation="softmax")
   ])
   model.summary()
@@ -140,7 +140,7 @@ history = model.fit(
 
 # Saving model
 now = dt.datetime.now()
-model_dir="models/{}/".format(now.strftime("%m_%d_%-I:%M:%S%p"))
+model_dir="models/{}/".format(now.strftime("%m_%d_%-I%M%S%p"))
 model.save(model_dir)
 print("Model for {} training set saved in {}".format(data_dir,model_dir))
 

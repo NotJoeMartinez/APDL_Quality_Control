@@ -18,48 +18,47 @@ import matplotlib.image as mpimg
 from PIL import Image, ImageOps
 
 
-subprocess.run("find . -name '.DS_Store' -type f -delete", shell=True)
-class_names = ['no strings', 'yes strings']
-now = dt.datetime.now().strftime("%m_%d_%I:%M:%S%p")
+# subprocess.run("find . -name '.DS_Store' -type f -delete", shell=True)
+# class_names = ["AllWires", "BrokenWires", "FooBar", "Glue", "NoWires", "OneThirdsWires", "TwoThirdsWires"]
+# now = dt.datetime.now().strftime("%m_%d_%I:%M:%S%p")
 
-def main(class_names=class_names):
-    # loads model if user supplied path
-    try:
-        model_path = sys.argv[1]
-        model_name = re.search('[^\/]*$', model_path).group()
-        model = keras.models.load_model(f"{model_path}")
+# def main(class_names=class_names, model_path=sys.argv[1]):
+#     # loads model if user supplied path
+#     try:
+#         model_name = re.search('[^\/]*$', model_path).group()
+#         model = keras.models.load_model(f"{model_path}")
 
-        model.summary()
-    except IndexError:
-        pass
+#         model.summary()
+#     except IndexError:
+#         pass
     
-    test_abunch(model, "datasets/testing")
-    # make_activation_map(model, model_name, img_path)
+#     test_abunch(model, "datasets/testing/")
+#     # make_activation_map(model, model_name, img_path)
 
-def test_abunch(model, img_dir):    
-    data_paths = []
-    for root, dirs, files in os.walk(img_dir):
-        for img in files:
-            data_paths.append(f"{root}/{img}")
+# def test_abunch(model, img_dir):    
+#     data_paths = []
+#     for root, dirs, files in os.walk(img_dir):
+#         for img in files:
+#             data_paths.append(f"{root}/{img}")
 
-    # print(data_paths)
-    for img_path in data_paths:
-        make_activation_map(model, img_path)
-
-
+#     # print(data_paths)
+#     for img_path in data_paths:
+#         make_activation_map(model, img_path)
 
 
-def make_activation_map(model, img_path):
+
+
+def make_activation_map(model, img_path, class_names):
 
     probability_model = tf.keras.Sequential([model, tf.keras.layers.Softmax()])
 
-    DIM = 299 
+    DIM = 480
 
     data = np.ndarray(shape=(1, DIM, DIM, 3), dtype=np.float32)
     img = Image.open(img_path)
     img = ImageOps.fit(img, (DIM, DIM), Image.ANTIALIAS)
     image_array= np.asarray(img)
-    normalized_image_array = (image_array.astype(np.float32) / 127.0) - 1
+    # normalized_image_array = (image_array.astype(np.float32) / 127.0) - 1
     normalized_image_array = image_array.astype(np.float32)
     data[0] = normalized_image_array
     prediction = probability_model.predict(data)
@@ -68,7 +67,7 @@ def make_activation_map(model, img_path):
 
     
     with tf.GradientTape() as tape:
-        last_conv_layer = model.get_layer('conv2d_93')
+        last_conv_layer = model.get_layer('conv2d_13')
         iterate = tf.keras.models.Model([model.inputs], [model.output, last_conv_layer.output])
         model_out, last_conv_layer = iterate(data)
         class_out = model_out[:, np.argmax(model_out[0])]
@@ -79,7 +78,7 @@ def make_activation_map(model, img_path):
 
     heatmap = np.maximum(heatmap, 0)
     heatmap /= np.max(heatmap)
-    heatmap = heatmap.reshape((8, 8))
+    heatmap = heatmap.reshape((7, 7))
 
     img = cv2.imread(img_path )
 
@@ -88,15 +87,15 @@ def make_activation_map(model, img_path):
     heatmap = cv2.applyColorMap(heatmap, cv2.COLORMAP_JET)
 
     superimposed_img = heatmap * 0.4 + img
-    superimposed_img_name = f"tests/activation_maps/superimposed/{str(uuid.uuid1())}.jpg"
+    superimposed_img_name = f"notes/activation_maps/superimposed/{str(uuid.uuid1())}.jpg"
 
     cv2.imwrite(f'{superimposed_img_name}', superimposed_img)
     plt_img = mpimg.imread(superimposed_img_name)
 
     plt.imshow(plt_img)
     plt.tight_layout()
-    plt.savefig(f"tests/activation_maps/plots/{str(uuid.uuid1())}.png")
-    plt.show()
+    plt.savefig(f"notes/activation_maps/plots/{str(uuid.uuid1())}.png")
+    # plt.show()
 
    
 

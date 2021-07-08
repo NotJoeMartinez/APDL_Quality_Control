@@ -23,6 +23,11 @@ data_cleaning/data
 models
 models/
 
+# ignore this bloat 
+notes/activation_maps
+notes/csvs
+notes/pdfs
+
 # Icon must end with two \r
 Icon
 
