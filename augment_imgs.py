@@ -13,10 +13,11 @@ def main(original_dir=sys.argv[1]):
     training_dir =  "datasets/training"
  
 
-    # os.makedirs(testing_dir, exist_ok=True)
-    # shutil.copytree(original_dir,training_dir)
-    # do_split(training_dir)
-    augment_traing_data(testing_dir, 170)
+    os.makedirs(testing_dir, exist_ok=True)
+    shutil.copytree(original_dir,training_dir)
+    do_split(training_dir)
+    augment_data(training_dir, 566, 'edge')
+    augment_data(testing_dir, 176, 'edge' )
 
 # split 30% of dataset?
 def do_split(directory):
@@ -32,8 +33,7 @@ def do_split(directory):
         mv_train_dirs(directory, move_dict)
 
 
-
-def augment_traing_data(root_dir, imgs_per_dir):
+def augment_data(root_dir, imgs_per_dir, fill_mode):
     transformations = {
                     'horizontal flip': h_flip, 
                     'vertical flip': v_flip,
@@ -75,7 +75,7 @@ def augment_traing_data(root_dir, imgs_per_dir):
             while n <= transformation_count:
                 key = random.choice(list(transformations)) 
                 try: 
-                    transformed_image = transformations[key](original_image)
+                    transformed_image = transformations[key](original_image, fill_mode)
 
                 except UnboundLocalError as ue:
                     print(ue)
@@ -101,20 +101,18 @@ def augment_traing_data(root_dir, imgs_per_dir):
             print(f'Error: {augmented_path} : {e.strerror}')
 
 
-
-
-def anticlockwise_rotation(image):
+def anticlockwise_rotation(image, fill_mode):
     angle = random.randint(0,180)
-    return rotate(image, angle, resize=False,  cval=1, mode='edge')
+    return rotate(image, angle, resize=False,  cval=0, mode=fill_mode)
 
-def clockwise_rotation(image):
+def clockwise_rotation(image, fill_mode):
     angle = random.randint(0,180)
-    return rotate(image, -angle, resize=False, cval=1,  mode='edge')
+    return rotate(image, -angle, resize=False, cval=0,  mode=fill_mode)
 
-def h_flip(image):
+def h_flip(image, fill_mode):
     return  np.fliplr(image)
 
-def v_flip(image):
+def v_flip(image, fill_mode):
     return np.flipud(image)
 
 
