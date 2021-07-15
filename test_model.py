@@ -11,7 +11,7 @@ subprocess.run("find . -name '.DS_Store' -type f -delete", shell=True)
 test_data_path = "datasets/testing/"
 class_names = ["AllWires", "BrokenWires", "FooBar", "Glue", "NoWires", "OneThirdsWires", "TwoThirdsWires"]
 
-def main(class_names=class_names, test_data_path=test_data_path, report_name=sys.argv[2], size=(480,480)):
+def main(class_names=class_names, test_data_path=test_data_path, report_name=sys.argv[2], size=(224,224)):
     # loads model if user supplied path
     try: 
       model_path = sys.argv[1]
@@ -106,8 +106,8 @@ def test_all_imgs(model, class_names, test_data_path, size):
       image = Image.open(img_path)
       image = ImageOps.fit(image, size, Image.ANTIALIAS)
       image_array = np.asarray(image)
-      # normalized_image_array = (image_array.astype(np.float32) / 127.0) - 1
-      normalized_image_array = image_array.astype(np.float32)
+      normalized_image_array = (image_array.astype(np.float32) / 127.0) - 1
+      # normalized_image_array = image_array.astype(np.float32)
       data[0] = normalized_image_array
       prediction = model.predict(data)
       label_prediction = np.argmax(prediction[0])

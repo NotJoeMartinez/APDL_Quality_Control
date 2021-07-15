@@ -29,7 +29,6 @@ img_width = 480
 
 train_ds = tf.keras.preprocessing.image_dataset_from_directory(
   data_dir,
-  labels='inferred',
   validation_split=0.2,
   subset="training",
   seed=123,
@@ -38,7 +37,6 @@ train_ds = tf.keras.preprocessing.image_dataset_from_directory(
 
 val_ds = tf.keras.preprocessing.image_dataset_from_directory(
   data_dir,
-  labels='inferred',
   validation_split=0.2,
   subset="validation",
   seed=123,
@@ -107,13 +105,10 @@ with strategy.scope():
 
 epochs=100
 
-import os
-#save_dir = f'model_checkpoints/d1_{options.d1}_d2_{options.d2}_l1-1_{options.l1_1}_l1-2_{options.l1_2}/'
-#model_name = 'CNNv2.e{epoch:03d}.val_acc_{val_accuracy:01.5f}.h5' 
+
 
 save_dir = f'model_checkpoints/JD_CNN_v1/'
 model_name = 'CNNv2.e{epoch:03d}.val_acc_{val_accuracy:01.5f}.h5' 
-print(f"MODEL_NAME HERE LINE 114: {model_name}")
 
 if not os.path.isdir(save_dir):
     os.makedirs(save_dir)
