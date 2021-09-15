@@ -15,7 +15,7 @@ def main(original_dir=sys.argv[1]):
 
     os.makedirs(testing_dir, exist_ok=True)
     shutil.copytree(original_dir,training_dir)
-    do_split(training_dir)
+    # do_split(training_dir)
     augment_data(training_dir, 566, 'edge')
     augment_data(testing_dir, 176, 'edge' )
 

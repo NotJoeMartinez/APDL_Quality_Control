@@ -5,9 +5,11 @@ import PIL
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras import layers
-from tensorflow.keras.models import Sequential 
+from tensorflow.keras.models import Sequential
 import pathlib
+
 import datetime as dt
+now = dt.datetime.now().strftime("%m_%d_%-I%M%S")
 
 from optparse import OptionParser
 
@@ -20,15 +22,18 @@ parser.add_option("--l1_2", type="float", dest="l1_2", default=0.007)
 (options, args) = parser.parse_args()
 
 
-data_dir = "datasets/training" 
+data_dir = "91321_croped_clean_fdupes/training" 
 data_dir = pathlib.Path(data_dir)
+
 
 batch_size = 128
 img_height = 480 
 img_width = 480 
 
+
 train_ds = tf.keras.preprocessing.image_dataset_from_directory(
   data_dir,
+  labels='inferred',
   validation_split=0.2,
   subset="training",
   seed=123,
@@ -45,14 +50,9 @@ val_ds = tf.keras.preprocessing.image_dataset_from_directory(
 
 class_names = train_ds.class_names
 
-
 print(f'class_names: {class_names}')
-foo = layers.experimental.preprocessing.Rescaling(1./255, input_shape=(img_height, img_width, 3))
-print(foo, type(foo))
 
-# this should be dynamic to the amout of directories there are in data_dir 
 num_classes =  7 
-print("This data directory has {} subdirectorys".format(num_classes))
 
 from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau, ModelCheckpoint, CSVLogger
 
@@ -62,7 +62,7 @@ strategy = tf.distribute.MirroredStrategy(devices=["/gpu:2","/gpu:3"],
 with strategy.scope():
 
   model = Sequential([
-   # rescales the input tensor to height, width and depth of input image
+    
     layers.experimental.preprocessing.Rescaling(1./255, input_shape=(img_height, img_width, 3)),
 
     layers.Conv2D(16, 3, padding='same', activation='relu'),
@@ -89,11 +89,13 @@ with strategy.scope():
     layers.MaxPooling2D(),
     layers.Conv2D(64, 3, padding='same', activation='relu'),
     layers.MaxPooling2D(pool_size=(3, 3)),
+
     layers.Flatten(),
-    layers.Dense(128, activation='relu',use_bias=True, kernel_regularizer=tf.keras.regularizers.l1( l=options.l1_1)),
+
+    layers.Dense(128, activation='relu',use_bias=True, kernel_regularizer =tf.keras.regularizers.l1( l=options.l1_1)),
     layers.Dropout(options.d1),
     layers.Dense(32, activation='relu'),
-    layers.Dense(32, activation='relu',use_bias=True, kernel_regularizer=tf.keras.regularizers.l1( l=options.l1_2)),
+    layers.Dense(32, activation='relu',use_bias=True, kernel_regularizer =tf.keras.regularizers.l1( l=options.l1_2)),
     layers.Dense(num_classes,activation="softmax")
   ])
   model.summary()
@@ -106,25 +108,27 @@ with strategy.scope():
 epochs=100
 
 
+# Declare model directory
+save_dir = f'models/{now}'
+model_name = '{now}.e{epoch:03d}.val_acc_{val_accuracy:01.5f}.h5' 
 
-save_dir = f'model_checkpoints/JD_CNN_v1/'
-model_name = 'CNNv2.e{epoch:03d}.val_acc_{val_accuracy:01.5f}.h5' 
-
+# make model checkpoint directory 
 if not os.path.isdir(save_dir):
     os.makedirs(save_dir)
-filepath = os.path.join(save_dir, model_name)
 
+# Declaring checkpoint 
+filepath = f"{save_dir}/{model_name}" 
 checkpoint = ModelCheckpoint(filepath, monitor="val_accuracy",
                         verbose=1, save_best_only=True, mode="max")
 
 early = EarlyStopping(monitor="val_loss",
                       mode="min", patience=12)
 
-csv_logger = CSVLogger('model_loger.csv', append=True, separator=',')
-#callbacks_list = [checkpoint, early, csv_logger]
+csv_logger = CSVLogger(f'{save_dir}/model_loger.csv', append=True, separator=',')
 callbacks_list = [checkpoint, csv_logger]
 
 
+# running model.fit
 history = model.fit(
   train_ds,
   validation_data=val_ds,
@@ -133,14 +137,7 @@ history = model.fit(
 )
 
 
-# Saving model
-now = dt.datetime.now()
-model_dir="models/{}/".format(now.strftime("%m_%d_%-I%M%S%p"))
-model.save(model_dir)
-print("Model for {} training set saved in {}".format(data_dir,model_dir))
-
-
-def show_model_details():
+def show_model_details(save_dir):
   acc = history.history['accuracy']
   val_acc = history.history['val_accuracy']
 
@@ -150,21 +147,19 @@ def show_model_details():
   epochs_range = range(epochs)
 
   plt.figure(figsize=(8, 8))
-  #plt.subplot(1, 2, 1)
   plt.subplot(2, 1, 1)
   plt.plot(epochs_range, acc, label='Training Accuracy')
   plt.plot(epochs_range, val_acc, label='Validation Accuracy')
   plt.legend(loc='lower right')
   plt.title('Training and Validation Accuracy')
 
-  #plt.subplot(1, 2, 2)
   plt.subplot(2, 1, 2)
   plt.plot(epochs_range, loss, label='Training Loss')
   plt.plot(epochs_range, val_loss, label='Validation Loss')
   plt.legend(loc='upper right')
   plt.title('Training and Validation Loss')
-  plt.show()
-  plt.savefig('performance.png')  
+
+  plt.savefig(f'{save_dir}/performance.png')  
 
 
-show_model_details()
+show_model_details(save_dir)
