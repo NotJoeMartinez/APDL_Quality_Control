@@ -1,5 +1,7 @@
+import datetime as dt
 """ Hacky way of getting quick statistics from model dataframe """
-def calculate_results(df, class_names):
+def calculate_results(df, class_names, model_path, report_name):
+    now = dt.datetime.now().strftime("%m%d%-I%M%S")
 
     total_tests = df.shape[0]
     total_correct = df['score'].value_counts()['True'] 
@@ -7,6 +9,10 @@ def calculate_results(df, class_names):
     percent_correct = (float(total_correct) / float(total_tests)) * 100
     missed_labels = df[df['score']=='False'] #subset dataFrame
 
+    print(f"DateTime Of Test: {now}")
+    print(f"Model Path: {model_path}")
+    print(f"Raw Test Data Path: notes/csvs/{report_name}.csv")
+    print("=======================")
     print(f"Total Tests: {total_tests}")
     print(f"correct predictions: {total_correct}")
     print(f"incorrect predictions: {total_incorrect}")
@@ -47,4 +53,5 @@ def make_md_notes(model, df, report_name, class_names):
       with redirect_stdout(f):
           model.summary()
       f.write("``` \n") 
+      print(f"report saved in: notes/{report_name}.md")
 

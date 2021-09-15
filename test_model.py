@@ -41,7 +41,7 @@ def main(class_names=class_names, test_data_path=test_data_path, report_name=sys
 
     # for calulating results
     from scripts.model_reporting import calculate_results
-    calculate_results(df, class_names)
+    calculate_results(df, class_names, model_path, report_name)
 
     # Makes markdown report using the plots and stuff
     from scripts.model_reporting import make_md_notes
@@ -84,6 +84,17 @@ def plot_image(predictions_array, class_names, img_array):
                                   100*np.max(predictions_array)))
 
 
+# progress bar
+def progress(count, total, status=''):
+    bar_len = 60
+    filled_len = int(round(bar_len * count / float(total)))
+
+    percents = round(100.0 * count / float(total), 1)
+    bar = '=' * filled_len + '-' * (bar_len - filled_len)
+
+    sys.stdout.write('[%s] %s%s ...%s\r' % (bar, percents, '%', status))
+    sys.stdout.flush()
+
     """
     Itterates through all test images, prints predictions, confidence levels 
     and wheather it actually  predicted it correctly it should return a pandas dataframe
@@ -98,8 +109,11 @@ def test_all_imgs(model, class_names, test_data_path, size):
         data_paths.append(os.path.join(root, name))
 
     # Makes preditctions of every image in the data paths list
+    print("Running Tests")
     for count, img_path in enumerate(data_paths):
-      print(f"{count}/{len(data_paths)}")
+
+      progress(count,len(data_paths))
+
       # make_activation_map(model,img_path, class_names) # Makes activation maps
       temp_data = []
       data = np.ndarray(shape=(1, size[0], size[1], 3), dtype=np.float32)
@@ -133,7 +147,6 @@ def test_all_imgs(model, class_names, test_data_path, size):
 
       pandas_data.append(temp_data)
     return pandas_data 
-
 
 
 """ Builds the plot with images of random images and one image of a broken wire """

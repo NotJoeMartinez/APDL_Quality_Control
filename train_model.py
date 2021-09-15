@@ -60,14 +60,20 @@ from tensorflow.keras.callbacks import EarlyStopping, ReduceLROnPlateau, ModelCh
 strategy = tf.distribute.MirroredStrategy(devices=["/gpu:2","/gpu:3"],
                              cross_device_ops=tf.distribute.HierarchicalCopyAllReduce())
 
+# no idea why but these need ot be here
+d1 = 0.5
+d2 = 0.3
+l1_1 = 0.07
+l1_2 = 0.007
+
 with strategy.scope():
 
   model = Sequential([
+    layers.experimental.preprocessing.Rescaling(1./255, input_shape=(img_size, img_size, 3)),
     
-    layers.experimental.preprocessing.Rescaling(1./255, input_shape=(img_height, img_width, 3)),
-
     layers.Conv2D(16, 3, padding='same', activation='relu'),
     layers.Conv2D(16, 3, padding='same', activation='relu'),
+    layers.BatchNormalization(), # added by KL
     layers.MaxPooling2D(),
     layers.Conv2D(16, 3, padding='same', activation='relu'),
     layers.Conv2D(16, 3, padding='same', activation='relu'),
@@ -82,6 +88,7 @@ with strategy.scope():
     layers.Conv2D(32, 3, padding='same', activation='relu'),
     layers.Conv2D(32, 3, padding='same', activation='relu'),
     layers.MaxPooling2D(),
+    layers.BatchNormalization(), # added by KL
     layers.Conv2D(32, 3, padding='same', activation='relu'),
     layers.Conv2D(32, 3, padding='same', activation='relu'),
     layers.MaxPooling2D(),
@@ -93,12 +100,14 @@ with strategy.scope():
 
     layers.Flatten(),
 
-    layers.Dense(128, activation='relu',use_bias=True, kernel_regularizer =tf.keras.regularizers.l1( l=options.l1_1)),
-    layers.Dropout(options.d1),
+    layers.Dense(128, activation='relu',use_bias=True, kernel_regularizer =tf.keras.regularizers.l1( l=l1_1)),
+    layers.Dropout(d1),
     layers.Dense(32, activation='relu'),
-    layers.Dense(32, activation='relu',use_bias=True, kernel_regularizer =tf.keras.regularizers.l1( l=options.l1_2)),
+    layers.Dense(32, activation='relu',use_bias=True, kernel_regularizer =tf.keras.regularizers.l1( l=l1_2)),
     layers.Dense(num_classes,activation="softmax")
-  ])
+    
+])  
+
   model.summary()
   print("Num Calsses: ",num_classes)
 
