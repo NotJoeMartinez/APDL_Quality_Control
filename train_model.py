@@ -10,6 +10,7 @@ import pathlib
 
 import datetime as dt
 now = dt.datetime.now().strftime("%m_%d_%-I%M%S")
+print(now)
 
 from optparse import OptionParser
 
@@ -110,14 +111,16 @@ epochs=100
 
 # Declare model directory
 save_dir = f'models/{now}'
-model_name = '{now}.e{epoch:03d}.val_acc_{val_accuracy:01.5f}.h5' 
+model_name = now + 'e{epoch:03d}.val_acc_{val_accuracy:01.5f}.h5' 
+
 
 # make model checkpoint directory 
 if not os.path.isdir(save_dir):
     os.makedirs(save_dir)
 
 # Declaring checkpoint 
-filepath = f"{save_dir}/{model_name}" 
+filepath = "{}/{}".format(save_dir,model_name)
+
 checkpoint = ModelCheckpoint(filepath, monitor="val_accuracy",
                         verbose=1, save_best_only=True, mode="max")
 
