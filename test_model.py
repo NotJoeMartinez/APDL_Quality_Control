@@ -45,7 +45,7 @@ def main(class_names=class_names, test_data_path=test_data_path, report_name=sys
 
     # Makes markdown report using the plots and stuff
     from scripts.model_reporting import make_md_notes
-    make_md_notes(model, df, report_name, class_names)
+    make_md_notes(model, df, report_name, class_names, model_path)
 
 
 """ Plots a confusion matrix and saves it to notes/imgs/{model_name.png}"""

@@ -28,8 +28,7 @@ data_dir = pathlib.Path(data_dir)
 
 
 batch_size = 128
-img_height = 480 
-img_width = 480 
+img_size = 480 
 
 
 train_ds = tf.keras.preprocessing.image_dataset_from_directory(
@@ -38,7 +37,7 @@ train_ds = tf.keras.preprocessing.image_dataset_from_directory(
   validation_split=0.2,
   subset="training",
   seed=123,
-  image_size=(img_height, img_width),
+  image_size=(img_size, img_size),
   batch_size=batch_size)
 
 val_ds = tf.keras.preprocessing.image_dataset_from_directory(
@@ -46,7 +45,7 @@ val_ds = tf.keras.preprocessing.image_dataset_from_directory(
   validation_split=0.2,
   subset="validation",
   seed=123,
-  image_size=(img_height, img_width),
+  image_size=(img_size, img_size),
   batch_size=batch_size)
 
 class_names = train_ds.class_names
@@ -175,3 +174,22 @@ def show_model_details(save_dir):
 
 
 show_model_details(save_dir)
+
+print(save_dir)
+from csv import writer
+  
+# The data assigned to the list 
+list_data=[now,model_name,save_dir,epochs,history.history['val_accuracy'],history.history['val_loss'],data_dir]
+  
+# Pre-requisite - The CSV file should be manually closed before running this code.
+
+# First, open the old CSV file in append mode, hence mentioned as 'a'
+# Then, for the CSV file, create a file object
+with open('training_hist.csv', 'a', newline='') as f_object:  
+    # Pass the CSV  file object to the writer() function
+    writer_object = writer(f_object)
+    # Result - a writer object
+    # Pass the data in the list as an argument into the writerow() function
+    writer_object.writerow(list_data)  
+    # Close the file object
+    f_object.close()

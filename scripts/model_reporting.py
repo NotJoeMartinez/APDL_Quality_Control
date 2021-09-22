@@ -30,7 +30,7 @@ def calculate_results(df, class_names, model_path, report_name):
 
 
 """"Makes a markdown summary in notes/{report_name.md}"""
-def make_md_notes(model, df, report_name, class_names):
+def make_md_notes(model, df, report_name, class_names, model_path):
     import markdown
     from contextlib import redirect_stdout
 
@@ -40,7 +40,7 @@ def make_md_notes(model, df, report_name, class_names):
       f.write(f"## Stats \n")
       with redirect_stdout(f):
         f.write("```\n")
-        calculate_results(df, class_names)
+        calculate_results(df, class_names, model_path, report_name)
         f.write("``` \n")
       f.write(f"### Confusion Matrix \n")
       f.write(f"![Confusion Matrix](imgs/{report_name}.png) \n")
