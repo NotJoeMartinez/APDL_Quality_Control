@@ -1,5 +1,4 @@
-import os
-import sys
+import os, math, sys
 import argparse
 import inspect
 import random
@@ -9,6 +8,24 @@ import re
 # take existing dataset and randomly pick two images from each sub directory
 # move these images to a new traing directory preserving their sub directories
 # Augment the remaining images and make sure you're not messing that up 
+
+def do_split(directory):
+    """[summary]
+    Trains calculates 30% of the total images
+
+    Args:
+        directory (string): the training directory is supplied to this as an arg
+
+    """
+    tree_dict = get_tree_dict(directory) 
+
+    for sub_dir in tree_dict:
+        
+        # finds 30% of the length of images in directory
+        thirty_percent = math.floor((len(tree_dict[sub_dir]) / 100) * 30) 
+
+        move_dict = parse_tree_dict(tree_dict,sub_dir,thirty_percent)
+        mv_train_dirs(directory, move_dict)
 
 
 ''' Gets dictionary of filetree ''' 

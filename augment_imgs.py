@@ -1,4 +1,4 @@
-import os, sys, shutil, subprocess, random, math, glob
+import os, sys, shutil, subprocess, random, math, glob 
 from skimage.transform import rotate 
 from skimage import img_as_ubyte
 import cv2
@@ -7,29 +7,19 @@ from skimage import io
 import augmentation as aug
 
 
-def main(original_dir=sys.argv[1]):
-    testing_dir =  "datasets/testing"
-    training_dir =  "datasets/training"
- 
+def main(args):
+    original_dir = args.original_dir
+    original_dir = args.training_dir
+    testing_dir = args.testing_dir
+    max_testing = args.max_testing_number
+    max_training = args.max_training_number
 
-    os.makedirs(testing_dir, exist_ok=True)
+    os.makedirs(testing_dir, exist_ok=False)
     shutil.copytree(original_dir,training_dir)
-    # do_split(training_dir)
-    augment_data(training_dir, 566, 'edge')
-    augment_data(testing_dir, 176, 'edge' )
 
-# split 30% of dataset?
-def do_split(directory):
-    tree_dict = aug.get_tree_dict(directory) 
-
-    for sub_dir in tree_dict:
-        
-        # finds 30% of the length of images in directory
-        thirty_percent = math.floor((len(tree_dict[sub_dir]) / 100) * 30) 
-
-        move_dict = aug.parse_tree_dict(tree_dict,sub_dir,thirty_percent)
-
-        aug.mv_train_dirs(directory, move_dict)
+    aug.do_split(original_dir)
+    augment_data(training_dir, max_training, 'edge')
+    augment_data(testing_dir, max_testing, 'edge' )
 
 
 def augment_data(root_dir, imgs_per_dir, fill_mode):
@@ -116,5 +106,28 @@ def v_flip(image, fill_mode):
 
 
 if __name__ == '__main__':
+
     subprocess.run("find . -name '.DS_Store' -type f -delete", shell=True)
-    main()
+
+    original_dir = "datasets/original"
+    testing_dir =  "datasets/testing"
+    training_dir =  "datasets/training"
+ 
+    import argparse
+
+    parser = argparse.ArgumentParser(description='Program to augment original dataset')
+
+    parser.add_argument("-od","--original-dir", action="store", type=str, required=True, 
+                        help="Original directory of the data, make sure you want to do this" )
+    parser.add_argument("-trdir", "--training-dir", action="store",type=str, default="datasets/training",
+                        help="Directory of training data, defaults to datasets/training" )
+    parser.add_argument("-tsdir", "--testing-dir", action="store",type=str, default="datasets/testing",
+                        help="Directory of testing data, defaults to datasets/testing" )
+    parser.add_argument("-mtrain", "--max-training-number", action="store", type=int, default=566,
+                        help="Augment training images up to this number")
+    parser.add_argument("-mtest", "--max-testing-number", action="store", type=int, default=176,
+                        help="Augment testing images up to this number")
+
+    args=parser.parse_args()
+
+    main(args)
