@@ -4,9 +4,8 @@ from skimage import img_as_ubyte
 import cv2
 import numpy as np
 from skimage import io
-from scripts.separate_datasets import get_tree_dict, parse_tree_dict, mv_train_dirs 
+import augmentation as aug
 
-subprocess.run("find . -name '.DS_Store' -type f -delete", shell=True)
 
 def main(original_dir=sys.argv[1]):
     testing_dir =  "datasets/testing"
@@ -21,16 +20,16 @@ def main(original_dir=sys.argv[1]):
 
 # split 30% of dataset?
 def do_split(directory):
-    tree_dict = get_tree_dict(directory) 
+    tree_dict = aug.get_tree_dict(directory) 
 
     for sub_dir in tree_dict:
         
         # finds 30% of the length of images in directory
         thirty_percent = math.floor((len(tree_dict[sub_dir]) / 100) * 30) 
 
-        move_dict = parse_tree_dict(tree_dict,sub_dir,thirty_percent)
+        move_dict = aug.parse_tree_dict(tree_dict,sub_dir,thirty_percent)
 
-        mv_train_dirs(directory, move_dict)
+        aug.mv_train_dirs(directory, move_dict)
 
 
 def augment_data(root_dir, imgs_per_dir, fill_mode):
@@ -117,4 +116,5 @@ def v_flip(image, fill_mode):
 
 
 if __name__ == '__main__':
+    subprocess.run("find . -name '.DS_Store' -type f -delete", shell=True)
     main()

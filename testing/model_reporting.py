@@ -14,11 +14,11 @@ def calculate_results(df, class_names, model_path, report_name):
     print(f"Raw Test Data Path: notes/csvs/{report_name}.csv")
     print("=======================")
     print(f"Total Tests: {total_tests}")
-    print(f"correct predictions: {total_correct}")
-    print(f"incorrect predictions: {total_incorrect}")
-    print(f"Percentage correct: {round(percent_correct, 2)}%")
+    print(f"Correct Predictions: {total_correct}")
+    print(f"Incorrect Predictions: {total_incorrect}")
+    print(f"Percentage Correct: {round(percent_correct, 2)}%")
     print("=======================")
-    print("Most missed predictions")
+    print("Most Missed predictions")
 
     for class_name in class_names:
       try:
