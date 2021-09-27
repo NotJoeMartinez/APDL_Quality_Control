@@ -1,26 +1,22 @@
-import os, sys, shutil, subprocess, random, math
+import os, shutil, random 
 from skimage.transform import rotate 
 from skimage import img_as_ubyte
 import cv2
-import numpy as np
 from skimage import io
 from glob import glob
-from pathlib import Path
-import augmentation as aug
-import datetime as dt
-
+import testing 
 
 def augment_data(original_dir, imgs_per_dir, fill_mode):
     transformations = {
-                    'horizontal_flip': h_flip, 
-                    'vertical_flip': v_flip,
-                    'flip_both': flip_both,
+                    # 'horizontal_flip': h_flip, 
+                    # 'vertical_flip': v_flip,
+                    # 'flip_both': flip_both,
                     'anticlockwise_rotation': anticlockwise_rotation, 
-                    'clockwise_rotation': clockwise_rotation,
+                    'clockwise_rotation': clockwise_rotation
                     }                
 
     for sub_dir in os.listdir(original_dir): 
-        print(f"preforming transformations on {sub_dir}")
+        print(f"preforming transformations on {sub_dir}\n")
         images_path = f"{original_dir}/{sub_dir}"
 
         # make a temp directory for the augmented images so you're not augmenting 
@@ -42,6 +38,7 @@ def augment_data(original_dir, imgs_per_dir, fill_mode):
 
         i = 1 
         while i <= int(images_to_generate):    
+            testing.progress(i, images_to_generate)
             image = random.choice(images)
             original_image = io.imread(image)
 
@@ -50,21 +47,18 @@ def augment_data(original_dir, imgs_per_dir, fill_mode):
             transformation_count = random.randint(1, len(transformations)) 
 
             # variable to iterate till number of transformation to apply
-            n = 0       
+            n=0       
             # randomly choosing method to call
             while n <= transformation_count:
                 key = random.choice(list(transformations)) 
-                print(type(key))
 
                 try: 
                     if key == "anticlockwise_rotation" or key == "clockwise_rotation":
-                        print(key)
                         transformed_image = transformations[key](original_image, fill_mode)[0]
                         angle = transformations[key](original_image, fill_mode)[1]
                         new_image_path = "{}augmented_{}_{}_{}.jpg".format(augmented_path,angle,key,i)
 
                     else:
-                        print(key)
                         transformed_image = transformations[key](original_image)
                         new_image_path = "{}augmented_{}_{}.jpg".format(augmented_path,key,i)
 
@@ -72,7 +66,7 @@ def augment_data(original_dir, imgs_per_dir, fill_mode):
                 except UnboundLocalError as ue:
                     print(ue)
                     pass
-                n += 1
+                n+=1
                 
             # Convert an image to unsigned byte format, with values in [0, 255].
             transformed_image = img_as_ubyte(transformed_image)  

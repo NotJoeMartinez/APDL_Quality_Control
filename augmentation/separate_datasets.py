@@ -1,14 +1,6 @@
-import os, math, sys, argparse, inspect, random, uuid
-import shutil
+import os, math, random, shutil
 import datetime as dt
-import re
 from pathlib import Path
-
-import logging
-time_stamp = dt.datetime.now().strftime("%H_%M_%S%p")
-logging_file = f"logs/{time_stamp}.log"
-print(f"logging file: {logging_file}")
-logging.basicConfig(filename=f'{logging_file}', level=logging.DEBUG)
 
 # take existing dataset and randomly pick two images from each sub directory
 # move these images to a new traing directory preserving their sub directories
@@ -37,7 +29,6 @@ def do_split(og_directory, dirpaths):
         mv_train_dirs(og_directory, move_dict, dirpaths)
 
 
-''' Gets dictionary of filetree ''' 
 def get_tree_dict(og_directory):
     """[summary]
     A dictionary with the keys as the classes and the values as the files assoscated with those classes

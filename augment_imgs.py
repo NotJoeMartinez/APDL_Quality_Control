@@ -9,14 +9,6 @@ from pathlib import Path
 import augmentation as aug
 import datetime as dt
 
-
-import logging
-time_stamp = dt.datetime.now().strftime("%H_%M_%S%p")
-logging_file = f"logs/{time_stamp}.log"
-print(f"logging file: {logging_file}")
-logging.basicConfig(filename=f'{logging_file}', level=logging.DEBUG)
-
-
 def main(args):
     original_dir = args.original_dir
     max_training = args.max_training_number

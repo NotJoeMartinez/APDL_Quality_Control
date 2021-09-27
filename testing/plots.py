@@ -1,4 +1,4 @@
-import os, random, uuid
+import os, random, uuid, sys
 import matplotlib.pyplot as plt
 import numpy as np
 from PIL import Image, ImageOps
@@ -159,3 +159,15 @@ def show_model_details(save_dir, history, epochs):
   plt.title('Training and Validation Loss')
 
   plt.savefig(f'{save_dir}/performance.png')  
+
+
+# progress bar
+def progress(count, total, status=''):
+  bar_len = 60
+  filled_len = int(round(bar_len * count / float(total)))
+
+  percents = round(100.0 * count / float(total), 1)
+  bar = '=' * filled_len + '-' * (bar_len - filled_len)
+
+  sys.stdout.write('[%s] %s%s ...%s\r' % (bar, percents, '%', status))
+  sys.stdout.flush()
