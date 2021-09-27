@@ -126,11 +126,16 @@ if __name__ == '__main__':
   default_size=(480,480)
 
   parser = argparse.ArgumentParser(description='Program to test model against testing dataset')
-  parser.add_argument("-c", "--classnames", action="store", type=list, default=class_names)
-  parser.add_argument("-t", "--testdatapath", action="store", type=str, default=test_data_path)
-  parser.add_argument("-r", "--reportname", action="store", type=str, default=defualt_report_name)
-  parser.add_argument("-s", "--inputsize", action="store",type=tuple, default=default_size)
-  parser.add_argument("-p", "--modelpath", action="store",type=str, required=True)
+  parser.add_argument("-c", "--classnames", action="store", type=list, default=class_names, 
+                                            help='Python list of class names ')
+  parser.add_argument("-t", "--testdatapath", action="store", type=str, default=test_data_path, 
+                                            help="Relative path to testing dataset defualts to datasets/testing/")
+  parser.add_argument("-r", "--reportname", action="store", type=str, default=defualt_report_name,
+                                            help="Name of the generated markdown report defaults to a uuid")
+  parser.add_argument("-s", "--inputsize", action="store",type=tuple, default=default_size,
+                                            help="Python tuple of first input layer defaults to (480, 480)")
+  parser.add_argument("-p", "--modelpath", action="store",type=str, required=True,
+                                            help="Relative path to model, required")
 
   args = parser.parse_args()
 
