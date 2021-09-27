@@ -11,7 +11,6 @@ def main(args):
   size = args.inputsize
   class_names = args.classnames
 
-
   try:
     model = keras.models.load_model(f"{model_path}") 
   except IndexError:

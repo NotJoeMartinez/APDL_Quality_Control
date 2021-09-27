@@ -18,8 +18,8 @@ def main(args):
     shutil.copytree(original_dir,training_dir)
 
     aug.do_split(original_dir)
-    augment_data(training_dir, max_training, 'edge')
-    augment_data(testing_dir, max_testing, 'edge' )
+    # augment_data(training_dir, max_training, 'edge')
+    # augment_data(testing_dir, max_testing, 'edge' )
 
 
 def augment_data(root_dir, imgs_per_dir, fill_mode):

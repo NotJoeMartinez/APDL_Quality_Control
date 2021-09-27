@@ -1,15 +1,20 @@
-import os, math, sys
-import argparse
-import inspect
-import random
+import os, math, sys, argparse, inspect, random, uuid
 import shutil
 import datetime as dt
 import re
+from pathlib import Path
+
+import logging
+time_stamp = dt.datetime.now().strftime("%H_%M_%S%p")
+logging_file = f"logs/{time_stamp}.log"
+print(f"logging file: {logging_file}")
+logging.basicConfig(filename=f'{logging_file}', level=logging.DEBUG)
+
 # take existing dataset and randomly pick two images from each sub directory
 # move these images to a new traing directory preserving their sub directories
 # Augment the remaining images and make sure you're not messing that up 
 
-def do_split(directory):
+def do_split(og_directory, dirpaths):
     """[summary]
     Trains calculates 30% of the total images
 
@@ -17,57 +22,82 @@ def do_split(directory):
         directory (string): the training directory is supplied to this as an arg
 
     """
-    tree_dict = get_tree_dict(directory) 
+
+    tree_dict = get_tree_dict(og_directory) 
 
     for sub_dir in tree_dict:
         
-        # finds 30% of the length of images in directory
-        thirty_percent = math.floor((len(tree_dict[sub_dir]) / 100) * 30) 
+        # finds 30% of the length of images of sub_dir images
+        num_imgs_in_sub_dir =len(tree_dict[sub_dir]) 
+        thirty_percent = math.floor( (num_imgs_in_sub_dir / 100) * 30)
 
+        # dictonary: key:"parent dir" val:"30% of original images"
         move_dict = parse_tree_dict(tree_dict,sub_dir,thirty_percent)
-        mv_train_dirs(directory, move_dict)
+
+        mv_train_dirs(og_directory, move_dict, dirpaths)
 
 
 ''' Gets dictionary of filetree ''' 
-def get_tree_dict(root_path):
+def get_tree_dict(og_directory):
+    """[summary]
+    A dictionary with the keys as the classes and the values as the files assoscated with those classes
+    Args:
+        og_directory (string): original directory passed augment_imgs.py 
+
+    Returns:
+        dict: keys->parent dir vales-> files in parent dir  
+    """
     tree_dict = {}
-    sub_dirs = [dirname.name for dirname in os.scandir(root_path)] 
+    sub_dirs = [dirname.name for dirname in os.scandir(og_directory)] 
 
     # Add sub dirs to tree dictionary
     for sub_dir in sub_dirs:
-        files = os.listdir(root_path + "/" + sub_dir) 
+        files = os.listdir(og_directory+ "/" + sub_dir) 
 
         tree_dict[sub_dir] = files
     
     return tree_dict
 
+def parse_tree_dict(tree_dict, sub_dir, number_to_grab):
+    """sumary_line
+    shuffles the files in the given subdirectory and builds a new dictionary with 30% of the images
+    Keyword arguments:
+    tree_dict -- description
+    key -- 
+    Return: dictonary of of file names 
+    """
 
-def parse_tree_dict(tree_dict, key, number_to_grab):
+    # Grabs list of files and shuffles list
+    shuff_list = tree_dict[sub_dir]
+    random.shuffle(shuff_list)
+
+    # grabs only how many files it needs for 30%
+    shuff_list = shuff_list[:number_to_grab]
+
+    # appends this list of files to a new dictionary with the parent directory as key
     move_dict = {}
-    # r_list = random.choices(tree_dict[key], k=number_to_grab)
-    foo = tree_dict[key]
-    random.shuffle(foo)
-    r_list = foo[:number_to_grab]
-
-    move_dict[key] = r_list
+    move_dict[sub_dir] = shuff_list 
+    
     return move_dict
 
 
-"""
-Moves stuff to testing directory
-"""
-def mv_train_dirs(root_path, move_dict):
 
-    move_list = []
-    for key in move_dict:
-        for index in move_dict[key]:
-            move_list.append(f"{key}/{index}")
+def mv_train_dirs(og_directory, move_dict, dirpaths):
+    """[summary]
+    moves images from move original to testing directory
+    """
 
-    for path in move_list:
-        parent_dir = re.findall("^(\w*)\/", path)
-        new_dir = f"datasets/testing/{parent_dir[0]}"
-        os.makedirs(new_dir, exist_ok=True)
-        src = f"{root_path}/{path}"
-        shutil.move(src, new_dir)
+    for parent_dir in move_dict:
+        move_list = move_dict[parent_dir]
+
+        for image in move_list:
+
+            src = f"{og_directory}/{parent_dir}/{image}" 
+
+            dest = str(Path(og_directory).parents[0])
+            dest = f"{dest}/testing/{parent_dir}"
+
+            os.makedirs(dest, exist_ok=True)
+            shutil.move(src,dest)
 
 
