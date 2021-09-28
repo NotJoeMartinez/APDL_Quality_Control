@@ -36,7 +36,8 @@ def main(args):
     db.add_csv_todb(csv_path=f"database/csvs/augmentations/{now}.csv")
 
     print("Cropping Images")
-    data_cleaning.crop_imgs(original_dir)
+    data_cleaning.crop_imgs(dirpaths["testing"])
+    data_cleaning.crop_imgs(dirpaths["training"])
 
 
 
@@ -59,6 +60,8 @@ if __name__ == '__main__':
 
     subprocess.run("find . -name '.DS_Store' -type f -delete", shell=True)
 
+    # default training = 566
+    # default testing = 176
  
     import argparse
 
@@ -66,9 +69,9 @@ if __name__ == '__main__':
 
     parser.add_argument("-od","--original-dir", action="store", type=str, required=True, 
                         help="Original directory of the data, make sure you want to do this" )
-    parser.add_argument("-mtrain", "--max-training-number", action="store", type=int, default=566,
+    parser.add_argument("-mtrain", "--max-training-number", action="store", type=int, default=20,
                         help="Augment training images up to this number")
-    parser.add_argument("-mtest", "--max-testing-number", action="store", type=int, default=176,
+    parser.add_argument("-mtest", "--max-testing-number", action="store", type=int, default=20,
                         help="Augment testing images up to this number")
 
     args=parser.parse_args()

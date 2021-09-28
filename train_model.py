@@ -155,18 +155,9 @@ plots.show_model_details(save_dir,history,epochs)
 print(save_dir)
 from csv import writer
   
-# The data assigned to the list 
 list_data=[now,model_name,save_dir,epochs,history.history['val_accuracy'],history.history['val_loss'],data_dir]
-  
-# Pre-requisite - The CSV file should be manually closed before running this code.
 
-# First, open the old CSV file in append mode, hence mentioned as 'a'
-# Then, for the CSV file, create a file object
-with open('training_hist.csv', 'a', newline='') as f_object:  
-    # Pass the CSV  file object to the writer() function
-    writer_object = writer(f_object)
-    # Result - a writer object
-    # Pass the data in the list as an argument into the writerow() function
+with open('training_hist.csv', 'a', newline='') as f:  
+    writer_object = writer(f)
     writer_object.writerow(list_data)  
-    # Close the file object
-    f_object.close()
+    f.close()

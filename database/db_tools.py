@@ -21,7 +21,7 @@ def make_aug_table():
 def execute_sql(shasum,og_filepath, new_filepath, aug_function, angle, dataset_name):
     print(f"{shasum}, {og_filepath}, {new_filepath}, {aug_function} ,{angle}, {dataset_name}")
  
-    con = sqlite3.connect('apdl.db')
+    con = sqlite3.connect('database/apdl.db')
     cur = con.cursor()
     cur.execute("INSERT INTO datasets VALUES (?, ?, ?, ?, ?, ?) ", (shasum, og_filepath,new_filepath,aug_function,angle, dataset_name))
     con.commit()
@@ -29,9 +29,10 @@ def execute_sql(shasum,og_filepath, new_filepath, aug_function, angle, dataset_n
 
 
 def get_shasum(filepath):
-    shasum = subprocess.check_output(f"shasum ../{filepath}", shell=True)
+    print(filepath)
+    shasum = subprocess.check_output(f"shasum {filepath}", shell=True)
     shasum = shasum.decode()
-    foo = re.search("^(.*) \.\.", shasum).group(1)
+    foo = re.search("^(.*) datasets", shasum).group(1)
     return foo
 
 def add_csv_todb(csv_path):
@@ -59,4 +60,3 @@ def log_augmentation(og_filepath, new_name, aug_function, now, angle=""):
         writer_object = csv.writer(f_object)
         writer_object.writerow(list_data)  
         f_object.close()
-
