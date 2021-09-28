@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd 
 from PIL import Image, ImageOps
 from tensorflow import keras
-from testing.plots import progress
+from model_testing.plots import progress
 
 """
 Itterates through all test images, prints predictions, confidence levels 

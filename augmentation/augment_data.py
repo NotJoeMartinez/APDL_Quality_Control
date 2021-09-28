@@ -4,13 +4,11 @@ from skimage import img_as_ubyte
 import cv2
 from skimage import io
 from glob import glob
-import testing, db 
+import model_testing
+import database as db
 
 def augment_data(original_dir, imgs_per_dir, fill_mode, now):
     transformations = {
-                    # 'horizontal_flip': h_flip, 
-                    # 'vertical_flip': v_flip,
-                    # 'flip_both': flip_both,
                     'anticlockwise_rotation': anticlockwise_rotation, 
                     'clockwise_rotation': clockwise_rotation
                     }                
@@ -38,7 +36,7 @@ def augment_data(original_dir, imgs_per_dir, fill_mode, now):
 
         i = 1 
         while i <= int(images_to_generate):    
-            testing.progress(i, images_to_generate)
+            model_testing.progress(i, images_to_generate)
             image = random.choice(images)
             original_image = io.imread(image)
 
@@ -95,14 +93,3 @@ def clockwise_rotation(image, fill_mode):
     angle = random.randint(0,180)
     return [rotate(image, -angle, resize=False, cval=0,  mode=fill_mode), angle]
 
-def h_flip(image):
-    horizontal_flip = cv2.flip(image, 1)
-    return horizontal_flip 
-
-def v_flip(image):
-    vertical_flip = cv2.flip(image, 0)
-    return vertical_flip 
-
-def flip_both(image):
-    horizontal_and_vertical = cv2.flip(image, -1)
-    return horizontal_and_vertical

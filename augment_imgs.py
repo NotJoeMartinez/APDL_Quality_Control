@@ -8,7 +8,8 @@ from glob import glob
 from pathlib import Path
 import augmentation as aug
 import datetime as dt
-import db
+import database as db
+import data_cleaning
 
 def main(args):
     original_dir = args.original_dir
@@ -19,15 +20,25 @@ def main(args):
     dirpaths = get_dir_paths(original_dir)
 
 
-    # you dont need to call this twice because copytree makes 
+    print("Splitting training data")
     os.makedirs(dirpaths["testing"], exist_ok=False)
     shutil.copytree(original_dir,dirpaths["training"])
-
     aug.do_split(dirpaths["training"], dirpaths)
 
+    print("augmenting training data")
     aug.augment_data(f"{dirpaths['training']}", max_training, 'edge',now)
+
+    print("augmenting testing data")
     aug.augment_data(f"{dirpaths['testing']}", max_testing, 'edge',now)
-    db.db_tools()
+
+    print("Adding csv to database")
+    
+    db.add_csv_todb(csv_path=f"database/csvs/augmentations/{now}.csv")
+
+    print("Cropping Images")
+    data_cleaning.crop_imgs(original_dir)
+
+
 
 
 def get_dir_paths(og_data_path):

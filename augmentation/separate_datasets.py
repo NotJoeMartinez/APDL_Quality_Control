@@ -9,10 +9,6 @@ from pathlib import Path
 def do_split(og_directory, dirpaths):
     """[summary]
     Trains calculates 30% of the total images
-
-    Args:
-        directory (string): the training directory is supplied to this as an arg
-
     """
 
     tree_dict = get_tree_dict(og_directory) 
@@ -82,7 +78,6 @@ def mv_train_dirs(og_directory, move_dict, dirpaths):
         move_list = move_dict[parent_dir]
 
         for image in move_list:
-            print(image)
 
             src = f"{og_directory}/{parent_dir}/{image}" 
 

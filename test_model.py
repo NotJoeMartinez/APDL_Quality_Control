@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd 
 from PIL import Image, ImageOps
 from tensorflow import keras
-import testing
+import model_testing 
 
 def main(args):
   report_name = args.reportname
@@ -26,22 +26,22 @@ def main(args):
       pass
 
   # where the testing actually happens
-  tested_images = testing.test_all_imgs(model, class_names, test_data_path, size) 
+  tested_images = model_testing.test_all_imgs(model, class_names, test_data_path, size) 
   df = pd.DataFrame(tested_images, columns = ['score','predicted','actual','confidence','path'])
   df.to_csv(f'notes/csvs/{report_name}.csv', encoding='utf-8')
 
   # for confusion matrix
-  testing.plot_confusion_matrix(df,fig_name=f"notes/imgs/{report_name}.png", show=False)  
+  model_testing.plot_confusion_matrix(df,fig_name=f"notes/imgs/{report_name}.png", show=False)  
 
   # for random sampleing 
-  testing.random_test_plot(model, class_names, test_data_path, report_name, size, show=False)
+  model_testing.random_test_plot(model, class_names, test_data_path, report_name, size, show=False)
 
   # for calulating results
-  from testing.model_reporting import calculate_results
+  from model_testing.model_reporting import calculate_results
   calculate_results(df, class_names, model_path, report_name)
 
   # Makes markdown report using the plots and stuff
-  from testing.model_reporting import make_md_notes
+  from model_testing.model_reporting import make_md_notes
   make_md_notes(model, df, report_name, class_names, model_path)
 
 

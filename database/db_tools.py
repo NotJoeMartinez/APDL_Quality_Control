@@ -34,8 +34,8 @@ def get_shasum(filepath):
     foo = re.search("^(.*) \.\.", shasum).group(1)
     return foo
 
-def add_csv_todb():
-    csv_path = "csvs/augmentations/09_27_21_11_1632795113.csv"
+def add_csv_todb(csv_path):
+    # this one checks sha sums
     dataset_name = re.search("\/(.*)\.csv$",csv_path).group(1)
 
     with open(csv_path, "r") as f:
@@ -50,4 +50,13 @@ def add_csv_todb():
             execute_sql(shasum, og_filepath,new_filepath,aug_function,angle,dataset_name)
 
 
-add_csv_todb()
+def log_augmentation(og_filepath, new_name, aug_function, now, angle=""):
+    # The data assigned to the list 
+    list_data=[og_filepath,new_name,aug_function,angle, ]
+  
+
+    with open(f'database/csvs/augmentations/{now}.csv', 'a', newline='') as f_object:  
+        writer_object = csv.writer(f_object)
+        writer_object.writerow(list_data)  
+        f_object.close()
+
