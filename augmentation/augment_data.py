@@ -4,9 +4,9 @@ from skimage import img_as_ubyte
 import cv2
 from skimage import io
 from glob import glob
-import testing 
+import testing, db 
 
-def augment_data(original_dir, imgs_per_dir, fill_mode):
+def augment_data(original_dir, imgs_per_dir, fill_mode, now):
     transformations = {
                     # 'horizontal_flip': h_flip, 
                     # 'vertical_flip': v_flip,
@@ -57,10 +57,12 @@ def augment_data(original_dir, imgs_per_dir, fill_mode):
                         transformed_image = transformations[key](original_image, fill_mode)[0]
                         angle = transformations[key](original_image, fill_mode)[1]
                         new_image_path = "{}augmented_{}_{}_{}.jpg".format(augmented_path,angle,key,i)
+                        db.log_augmentation(image,new_image_path,key,now,angle)
 
                     else:
                         transformed_image = transformations[key](original_image)
                         new_image_path = "{}augmented_{}_{}.jpg".format(augmented_path,key,i)
+                        db.log_augmentation(image,new_image_path,key,now, angle)
 
                         
                 except UnboundLocalError as ue:

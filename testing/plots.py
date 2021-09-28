@@ -5,10 +5,11 @@ from PIL import Image, ImageOps
 import pandas as pd
 import tensorflow as tf
 import cv2
+import seaborn as sn
 
 """ Plots a confusion matrix and saves it to notes/imgs/{model_name.png}"""
 def plot_confusion_matrix(df, fig_name="", show=False):
-    import seaborn as sn
+    print(df)
     fig, ax = plt.subplots(figsize=(20, 10))
     confusion_matrix = pd.crosstab(df['predicted'], df['actual'], rownames=['Predicted'], colnames=['Actual'])
 

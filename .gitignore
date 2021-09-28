@@ -8,9 +8,12 @@ env/
 .AppleDouble
 .LSOverride
 reset.sh
-
+*.db
+*.log
 notes/*
 test.py
+*.txt
+*.csv
 
 # Don't push the datasets (they're too big.. ) 
 datasets/testing/**/*.jpg
@@ -19,6 +22,7 @@ datasets/training/**/*.png
 datasets/training/**/*.jpg
 data_cleaning/data/
 data_cleaning/data
+db/csvs/augmentations/*.csv
 
 
 # Don't push the models. 

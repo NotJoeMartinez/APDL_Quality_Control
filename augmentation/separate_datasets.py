@@ -82,6 +82,7 @@ def mv_train_dirs(og_directory, move_dict, dirpaths):
         move_list = move_dict[parent_dir]
 
         for image in move_list:
+            print(image)
 
             src = f"{og_directory}/{parent_dir}/{image}" 
 

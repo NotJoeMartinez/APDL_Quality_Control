@@ -8,23 +8,26 @@ from glob import glob
 from pathlib import Path
 import augmentation as aug
 import datetime as dt
+import db
 
 def main(args):
     original_dir = args.original_dir
     max_training = args.max_training_number
     max_testing = args.max_testing_number
+    now = dt.datetime.now().strftime("%m_%d_%H_%M_%s")
 
     dirpaths = get_dir_paths(original_dir)
+
 
     # you dont need to call this twice because copytree makes 
     os.makedirs(dirpaths["testing"], exist_ok=False)
     shutil.copytree(original_dir,dirpaths["training"])
 
-    aug.do_split(original_dir, dirpaths)
+    aug.do_split(dirpaths["training"], dirpaths)
 
-    aug.augment_data(f"{dirpaths['training']}", max_training, 'edge')
-    aug.augment_data(f"{dirpaths['testing']}", max_testing, 'edge' )
-
+    aug.augment_data(f"{dirpaths['training']}", max_training, 'edge',now)
+    aug.augment_data(f"{dirpaths['testing']}", max_testing, 'edge',now)
+    db.db_tools()
 
 
 def get_dir_paths(og_data_path):

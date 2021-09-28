@@ -3,7 +3,7 @@ import numpy as np
 import pandas as pd 
 from PIL import Image, ImageOps
 from tensorflow import keras
-import testing 
+import testing
 
 def main(args):
   report_name = args.reportname
@@ -50,7 +50,7 @@ if __name__ == '__main__':
 
   import uuid
 
-  test_data_path = "datasets/testing/"
+  test_data_path = "datasets/91021_no_splits/testing/"
   class_names = ["AllWires", "BrokenWires", "FooBar", "Glue", "NoWires", "OneThirdsWires", "TwoThirdsWires"]
   defualt_report_name = str(uuid.uuid1())
   default_size=(480,480)
