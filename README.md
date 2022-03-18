@@ -1,5 +1,5 @@
 # APDL_Quality_Control
-This project is my contribution to [this](https://arxiv.org/abs/2203.08969) white paper that explores
+This project is my contribution to this [white paper](https://arxiv.org/abs/2203.08969) that explores
 Deep learning applications for quality control in particle detector construction.
 
 
