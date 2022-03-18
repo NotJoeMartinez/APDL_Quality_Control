@@ -1,5 +1,7 @@
 # APDL_Quality_Control
-This project is intended to help with the quality control process of manufacturing calorimeters. 
+This project is my contribution to [this](https://arxiv.org/abs/2203.08969) white paper that explores
+Deep learning applications for quality control in particle detector construction.
+
 
 ### Confusion Matrix
 ![](docs/imgs/confustion_matrix.png.png)
