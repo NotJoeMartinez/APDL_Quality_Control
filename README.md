@@ -1,10 +1,9 @@
 # APDL_Quality_Control
-This project is my contribution to this [white paper](https://arxiv.org/abs/2203.08969) that explores
-Deep learning applications for quality control in particle detector construction.
 
+Deep learning applications for quality control in particle detector construction: 
 
-### Confusion Matrix
-![](docs/imgs/confustion_matrix.png.png)
+https://arxiv.org/abs/2203.08969
+
 ### Radom Samples
 ![](docs/imgs/rand_samples.png)
 
